@@ -32,6 +32,13 @@
 		<url>http://jenkins.imagej.net/job/ImageJ-plugins-commands/</url>
 	</ciManagement>
 
+	<repositories>
+		<repository>
+			<id>imagej.public</id>
+			<url>http://maven.imagej.net/content/groups/public</url>
+		</repository>
+	</repositories>
+
 	<dependencies>
 		<!-- SCIFIO dependencies -->
 		<dependency>
@@ -96,12 +103,5 @@
 			</plugin>
 		</plugins>
 	</build>
-
-	<repositories>
-		<repository>
-			<id>imagej.public</id>
-			<url>http://maven.imagej.net/content/groups/public</url>
-		</repository>
-	</repositories>
 
 </project>
