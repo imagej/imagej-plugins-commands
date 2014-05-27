@@ -52,13 +52,14 @@ import org.scijava.plugin.Parameter;
 import org.scijava.plugin.Plugin;
 
 /**
- * Uploads a sample image to the ImageJDev server for further inspection
- * by the developers.
- *
+ * Uploads a sample image to the ImageJDev server for further inspection by the
+ * developers.
+ * 
  * @author Johannes Schindelin
  */
 @Plugin(type = Command.class, menuPath = "Help>Upload Sample Image")
 public class SampleImageUploader implements Command {
+
 	@Parameter
 	private File sampleImage;
 
@@ -71,9 +72,12 @@ public class SampleImageUploader implements Command {
 	private static String baseURL = "http://upload.imagej.net/";
 
 	/**
-	 * This method provides a Java API to upload sample images to the ImageJ2 dropbox.
+	 * This method provides a Java API to upload sample images to the ImageJ2
+	 * dropbox.
 	 */
-	public static void run(final File file, final StatusService status, final LogService log) {
+	public static void run(final File file, final StatusService status,
+		final LogService log)
+	{
 		final SampleImageUploader uploader = new SampleImageUploader();
 		uploader.sampleImage = file;
 		uploader.status = status;
@@ -85,7 +89,8 @@ public class SampleImageUploader implements Command {
 	public void run() {
 		try {
 			uploadFile(sampleImage);
-		} catch (Exception e) {
+		}
+		catch (Exception e) {
 			log.error(e);
 		}
 	}
@@ -97,7 +102,8 @@ public class SampleImageUploader implements Command {
 		String path = file.toURI().toURL().getFile();
 		// Extract file name only, without trailing '/'
 		path = path.substring(path.lastIndexOf('/', path.length() - 2) + 1);
-		upload(baseURL + path, new BufferedInputStream(new FileInputStream(file)), file.length());
+		upload(baseURL + path, new BufferedInputStream(new FileInputStream(file)),
+			file.length());
 	}
 
 	private void upload(final String url, final InputStream in,
@@ -105,9 +111,11 @@ public class SampleImageUploader implements Command {
 	{
 		if (status != null) status.showStatus("Uploading " + url);
 
-		final HttpURLConnection connection = (HttpURLConnection) new URL(url).openConnection();
+		final HttpURLConnection connection =
+			(HttpURLConnection) new URL(url).openConnection();
 		final String authentication = "ij2-sample-upload:password";
-		connection.setRequestProperty("Authorization", "Basic " + Base64.encodeBytes(authentication.getBytes()));
+		connection.setRequestProperty("Authorization", "Basic " +
+			Base64.encodeBytes(authentication.getBytes()));
 		connection.setRequestProperty("Content-Type", "application/octet-stream");
 		connection.setDoOutput(true);
 		connection.setRequestMethod("PUT");
@@ -119,12 +127,14 @@ public class SampleImageUploader implements Command {
 			if (count2 < 0) break;
 			out.write(buffer, 0, count2);
 			count += count2;
-			if (totalLength > 0 && status != null) status.showProgress((int)count, (int)totalLength);
+			if (totalLength > 0 && status != null) status.showProgress((int) count,
+				(int) totalLength);
 		}
 		out.close();
 		in.close();
 
-		final BufferedReader response = new BufferedReader(new InputStreamReader(connection.getInputStream()));
+		final BufferedReader response =
+			new BufferedReader(new InputStreamReader(connection.getInputStream()));
 		for (;;) {
 			String line = response.readLine();
 			if (line == null) break;
