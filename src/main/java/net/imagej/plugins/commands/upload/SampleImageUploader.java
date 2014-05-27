@@ -50,6 +50,10 @@ import org.scijava.command.Command;
 import org.scijava.log.LogService;
 import org.scijava.plugin.Parameter;
 import org.scijava.plugin.Plugin;
+import org.scijava.ui.DialogPrompt.MessageType;
+import org.scijava.ui.DialogPrompt.OptionType;
+import org.scijava.ui.DialogPrompt.Result;
+import org.scijava.ui.UIService;
 
 /**
  * Uploads a sample image to the ImageJDev server for further inspection by the
@@ -69,6 +73,9 @@ public class SampleImageUploader implements Command {
 	@Parameter
 	private LogService log;
 
+	@Parameter(required = false)
+	private UIService ui;
+
 	private static String baseURL = "http://upload.imagej.net/";
 
 	/**
@@ -87,6 +94,17 @@ public class SampleImageUploader implements Command {
 
 	@Override
 	public void run() {
+		if (sampleImage.length() >= 20 * 1024 * 1024) {
+			if (ui == null) {
+				log.error("File too large: " + sampleImage);
+				return;
+			}
+			final Result answer =
+				ui.showDialog("The file is really large: " + sampleImage +
+					". Continue?", "Huge file!", MessageType.QUESTION_MESSAGE,
+					OptionType.OK_CANCEL_OPTION);
+			if (answer != Result.OK_OPTION) return;
+		}
 		try {
 			uploadFile(sampleImage);
 		}
