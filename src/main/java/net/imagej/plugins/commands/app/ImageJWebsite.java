@@ -38,6 +38,7 @@ import org.scijava.command.Command;
 import org.scijava.log.LogService;
 import org.scijava.menu.MenuConstants;
 import org.scijava.platform.PlatformService;
+import org.scijava.plugin.Attr;
 import org.scijava.plugin.Menu;
 import org.scijava.plugin.Parameter;
 import org.scijava.plugin.Plugin;
@@ -52,7 +53,7 @@ import org.scijava.plugin.Plugin;
 		@Menu(label = MenuConstants.HELP_LABEL,
 			weight = MenuConstants.HELP_WEIGHT,
 			mnemonic = MenuConstants.HELP_MNEMONIC),
-		@Menu(label = "ImageJ Website...", weight = 42) }, headless = true)
+		@Menu(label = "ImageJ Website...", weight = 42) }, headless = true, attrs = { @Attr(name = "no-legacy") })
 public class ImageJWebsite implements Command {
 
 	@Parameter

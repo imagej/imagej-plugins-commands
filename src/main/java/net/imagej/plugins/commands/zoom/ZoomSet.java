@@ -41,6 +41,7 @@ import org.scijava.command.Command;
 import org.scijava.command.DynamicCommand;
 import org.scijava.menu.MenuConstants;
 import org.scijava.module.MutableModuleItem;
+import org.scijava.plugin.Attr;
 import org.scijava.plugin.Menu;
 import org.scijava.plugin.Parameter;
 import org.scijava.plugin.Plugin;
@@ -57,7 +58,7 @@ import org.scijava.util.RealRect;
 	@Menu(label = MenuConstants.IMAGE_LABEL, weight = MenuConstants.IMAGE_WEIGHT,
 		mnemonic = MenuConstants.IMAGE_MNEMONIC),
 	@Menu(label = "Zoom", mnemonic = 'z'), @Menu(label = "Set...", weight = 6) },
-	headless = true, initializer = "initAll")
+	headless = true, initializer = "initAll", attrs = { @Attr(name = "no-legacy") })
 public class ZoomSet extends DynamicCommand {
 
 	// -- Constants --

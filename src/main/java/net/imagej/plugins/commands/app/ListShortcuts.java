@@ -45,6 +45,7 @@ import org.scijava.input.Accelerator;
 import org.scijava.menu.MenuConstants;
 import org.scijava.module.ModuleInfo;
 import org.scijava.module.ModuleService;
+import org.scijava.plugin.Attr;
 import org.scijava.plugin.Menu;
 import org.scijava.plugin.Parameter;
 import org.scijava.plugin.Plugin;
@@ -61,7 +62,7 @@ import org.scijava.plugin.Plugin;
 	@Menu(label = MenuConstants.PLUGINS_LABEL,
 		weight = MenuConstants.PLUGINS_WEIGHT,
 		mnemonic = MenuConstants.PLUGINS_MNEMONIC), @Menu(label = "Shortcuts"),
-	@Menu(label = "List Shortcuts...", weight = 1) })
+	@Menu(label = "List Shortcuts...", weight = 1) }, attrs = { @Attr(name = "no-legacy") })
 public class ListShortcuts extends ContextCommand {
 
 	@Parameter

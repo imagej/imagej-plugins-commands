@@ -36,6 +36,7 @@ import net.imagej.display.ImageDisplay;
 import org.scijava.command.Command;
 import org.scijava.command.UnimplementedCommand;
 import org.scijava.menu.MenuConstants;
+import org.scijava.plugin.Attr;
 import org.scijava.plugin.Menu;
 import org.scijava.plugin.Parameter;
 import org.scijava.plugin.Plugin;
@@ -51,7 +52,7 @@ import org.scijava.plugin.Plugin;
 		@Menu(label = MenuConstants.ANALYZE_LABEL,
 			weight = MenuConstants.ANALYZE_WEIGHT,
 			mnemonic = MenuConstants.ANALYZE_MNEMONIC), @Menu(label = "Tools"),
-		@Menu(label = "Synchronize Windows") })
+		@Menu(label = "Synchronize Windows") }, attrs = { @Attr(name = "no-legacy") })
 public class SynchronizeWindows extends UnimplementedCommand {
 
 	// -- Parameters --

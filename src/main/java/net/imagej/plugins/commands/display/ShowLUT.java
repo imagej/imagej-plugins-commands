@@ -53,6 +53,7 @@ import org.scijava.command.ContextCommand;
 import org.scijava.display.Display;
 import org.scijava.display.DisplayService;
 import org.scijava.menu.MenuConstants;
+import org.scijava.plugin.Attr;
 import org.scijava.plugin.Menu;
 import org.scijava.plugin.Parameter;
 import org.scijava.plugin.Plugin;
@@ -76,7 +77,7 @@ import org.scijava.util.Colors;
 		@Menu(label = MenuConstants.IMAGE_LABEL, weight = MenuConstants.IMAGE_WEIGHT,
 			mnemonic = MenuConstants.IMAGE_MNEMONIC),
 		@Menu(label = "Color"),
-		@Menu(label = "Show LUT", weight = 12) })
+		@Menu(label = "Show LUT", weight = 12) }, attrs = { @Attr(name = "no-legacy") })
 public class ShowLUT extends ContextCommand {
 
 	// -- Parameters --

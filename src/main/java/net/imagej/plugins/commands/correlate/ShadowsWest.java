@@ -33,6 +33,7 @@ package net.imagej.plugins.commands.correlate;
 
 import org.scijava.command.Command;
 import org.scijava.menu.MenuConstants;
+import org.scijava.plugin.Attr;
 import org.scijava.plugin.Menu;
 import org.scijava.plugin.Plugin;
 
@@ -47,7 +48,7 @@ import org.scijava.plugin.Plugin;
 			weight = MenuConstants.PROCESS_WEIGHT,
 			mnemonic = MenuConstants.PROCESS_MNEMONIC),
 		@Menu(label = "Shadows", mnemonic = 's'),
-		@Menu(label = "West", weight = 7) }, headless = true)
+		@Menu(label = "West", weight = 7) }, headless = true, attrs = { @Attr(name = "no-legacy") })
 public class ShadowsWest extends AbstractShadows {
 
 	static final double[] KERNEL = { 1, 0, -1, 2, 1, -2, 1, 0, -1 };

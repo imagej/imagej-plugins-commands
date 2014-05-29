@@ -39,6 +39,7 @@ import org.scijava.ItemIO;
 import org.scijava.command.Command;
 import org.scijava.command.ContextCommand;
 import org.scijava.menu.MenuConstants;
+import org.scijava.plugin.Attr;
 import org.scijava.plugin.Menu;
 import org.scijava.plugin.Parameter;
 import org.scijava.plugin.Plugin;
@@ -53,7 +54,7 @@ import org.scijava.ui.UIService;
 @Plugin(type = Command.class, menu = {
 	@Menu(label = MenuConstants.IMAGE_LABEL, weight = MenuConstants.IMAGE_WEIGHT,
 		mnemonic = MenuConstants.IMAGE_MNEMONIC), @Menu(label = "Overlay"),
-	@Menu(label = "Flatten", weight = 4) })
+	@Menu(label = "Flatten", weight = 4) }, attrs = { @Attr(name = "no-legacy") })
 public class Flatten extends ContextCommand {
 
 	// -- Parameters --

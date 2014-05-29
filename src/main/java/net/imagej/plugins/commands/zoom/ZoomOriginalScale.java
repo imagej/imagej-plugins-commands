@@ -38,6 +38,7 @@ import org.scijava.ItemIO;
 import org.scijava.command.Command;
 import org.scijava.command.ContextCommand;
 import org.scijava.menu.MenuConstants;
+import org.scijava.plugin.Attr;
 import org.scijava.plugin.Menu;
 import org.scijava.plugin.Parameter;
 import org.scijava.plugin.Plugin;
@@ -52,7 +53,7 @@ import org.scijava.plugin.Plugin;
 		mnemonic = MenuConstants.IMAGE_MNEMONIC),
 	@Menu(label = "Zoom", mnemonic = 'z'),
 	@Menu(label = "Original Scale", accelerator = "^NUM4", weight = 3) },
-	headless = true)
+	headless = true, attrs = { @Attr(name = "no-legacy") })
 public class ZoomOriginalScale extends ContextCommand {
 
 	@Parameter

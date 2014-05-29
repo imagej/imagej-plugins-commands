@@ -51,6 +51,7 @@ import org.scijava.command.DynamicCommand;
 import org.scijava.menu.MenuConstants;
 import org.scijava.module.DefaultMutableModuleItem;
 import org.scijava.module.MutableModuleItem;
+import org.scijava.plugin.Attr;
 import org.scijava.plugin.Menu;
 import org.scijava.plugin.Parameter;
 import org.scijava.plugin.Plugin;
@@ -66,7 +67,7 @@ import org.scijava.plugin.Plugin;
 		@Menu(label = MenuConstants.FILE_LABEL, weight = MenuConstants.FILE_WEIGHT,
 			mnemonic = MenuConstants.FILE_MNEMONIC),
 		@Menu(label = "New", mnemonic = 'n'),
-		@Menu(label = "Image...", weight = 0, mnemonic = 'i', accelerator = "^N") })
+		@Menu(label = "Image...", weight = 0, mnemonic = 'i', accelerator = "^N") }, attrs = { @Attr(name = "no-legacy") })
 public class NewImage<U extends RealType<U> & NativeType<U>> extends
 	DynamicCommand
 {

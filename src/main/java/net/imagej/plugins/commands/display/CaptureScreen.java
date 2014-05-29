@@ -38,6 +38,7 @@ import org.scijava.ItemIO;
 import org.scijava.command.Command;
 import org.scijava.command.ContextCommand;
 import org.scijava.menu.MenuConstants;
+import org.scijava.plugin.Attr;
 import org.scijava.plugin.Menu;
 import org.scijava.plugin.Parameter;
 import org.scijava.plugin.Plugin;
@@ -53,7 +54,7 @@ import org.scijava.plugin.Plugin;
 			mnemonic = MenuConstants.PLUGINS_MNEMONIC),
 	@Menu(label = "Utilities"),
 	@Menu(label = "Capture Screen", weight = 20, 
-				accelerator = "shift ^G")})
+				accelerator = "shift ^G")}, attrs = { @Attr(name = "no-legacy") })
 public class CaptureScreen extends ContextCommand {
 
 	// -- Parameters --

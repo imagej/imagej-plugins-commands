@@ -42,6 +42,7 @@ import org.scijava.ItemIO;
 import org.scijava.command.Command;
 import org.scijava.command.ContextCommand;
 import org.scijava.menu.MenuConstants;
+import org.scijava.plugin.Attr;
 import org.scijava.plugin.Menu;
 import org.scijava.plugin.Parameter;
 import org.scijava.plugin.Plugin;
@@ -54,7 +55,7 @@ import org.scijava.plugin.Plugin;
 @Plugin(type = Command.class, menu = {
 	@Menu(label = MenuConstants.EDIT_LABEL, weight = MenuConstants.EDIT_WEIGHT,
 		mnemonic = MenuConstants.EDIT_MNEMONIC),
-	@Menu(label = "Fill", weight = 28, accelerator = "^F") }, headless = true)
+	@Menu(label = "Fill", weight = 28, accelerator = "^F") }, headless = true, attrs = { @Attr(name = "no-legacy") })
 public class FillDataValues<T extends RealType<T>> extends ContextCommand {
 
 	// -- Parameters --

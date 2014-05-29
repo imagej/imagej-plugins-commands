@@ -58,6 +58,7 @@ import org.scijava.command.Command;
 import org.scijava.event.EventHandler;
 import org.scijava.menu.MenuConstants;
 import org.scijava.module.MutableModuleItem;
+import org.scijava.plugin.Attr;
 import org.scijava.plugin.Menu;
 import org.scijava.plugin.Parameter;
 import org.scijava.plugin.Plugin;
@@ -116,7 +117,7 @@ import org.scijava.widget.NumberWidget;
 	@Menu(label = MenuConstants.IMAGE_LABEL, weight = MenuConstants.IMAGE_WEIGHT,
 		mnemonic = MenuConstants.IMAGE_MNEMONIC), @Menu(label = "Adjust"),
 	@Menu(label = "Threshold...", accelerator = "shift ^T") },
-	initializer = "initValues")
+	initializer = "initValues", attrs = { @Attr(name = "no-legacy") })
 public class Threshold<T extends RealType<T>> extends InteractiveImageCommand {
 
 	// -- constants --
