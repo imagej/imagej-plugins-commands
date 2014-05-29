@@ -39,6 +39,7 @@ import net.imglib2.type.logic.BitType;
 
 import org.scijava.command.Command;
 import org.scijava.menu.MenuConstants;
+import org.scijava.plugin.Attr;
 import org.scijava.plugin.Menu;
 import org.scijava.plugin.Plugin;
 
@@ -53,7 +54,7 @@ import org.scijava.plugin.Plugin;
 		weight = MenuConstants.PROCESS_WEIGHT,
 		mnemonic = MenuConstants.PROCESS_MNEMONIC),
 	@Menu(label = "Binary", mnemonic = 'b'), @Menu(label = "Open") },
-	headless = true)
+	headless = true, attrs = { @Attr(name = "no-legacy") })
 public class OpenBinaryImage extends AbstractMorphOpsCommand {
 
 	@Override

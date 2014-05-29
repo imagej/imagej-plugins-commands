@@ -36,6 +36,7 @@ import net.imagej.display.ImageDisplay;
 import org.scijava.command.Command;
 import org.scijava.command.UnimplementedCommand;
 import org.scijava.menu.MenuConstants;
+import org.scijava.plugin.Attr;
 import org.scijava.plugin.Menu;
 import org.scijava.plugin.Parameter;
 import org.scijava.plugin.Plugin;
@@ -48,7 +49,7 @@ import org.scijava.plugin.Plugin;
 @Plugin(type = Command.class, iconPath = "/icons/commands/bricks.png", menu = {
 	@Menu(label = MenuConstants.IMAGE_LABEL, weight = MenuConstants.IMAGE_WEIGHT,
 		mnemonic = MenuConstants.IMAGE_MNEMONIC), @Menu(label = "Stacks"),
-	@Menu(label = "Orthogonal Views", weight = 5, accelerator = "shift ^H") })
+	@Menu(label = "Orthogonal Views", weight = 5, accelerator = "shift ^H") }, attrs = { @Attr(name = "no-legacy") })
 public class OrthogonalViews extends UnimplementedCommand {
 
 	// -- Parameters --

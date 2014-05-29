@@ -47,6 +47,7 @@ import org.scijava.ItemIO;
 import org.scijava.command.Command;
 import org.scijava.menu.MenuConstants;
 import org.scijava.module.MutableModuleItem;
+import org.scijava.plugin.Attr;
 import org.scijava.plugin.Menu;
 import org.scijava.plugin.Parameter;
 import org.scijava.plugin.Plugin;
@@ -69,7 +70,7 @@ import org.scijava.widget.NumberWidget;
 		@Menu(label = "Adjust"),
 		@Menu(label = "Brightness/Contrast...", accelerator = "shift ^C",
 			weight = 0) }, iconPath = "/icons/commands/contrast.png",
-	headless = true, initializer = "initValues")
+	headless = true, initializer = "initValues", attrs = { @Attr(name = "no-legacy") })
 public class BrightnessContrast<T extends RealType<T>> extends
 	InteractiveImageCommand
 {

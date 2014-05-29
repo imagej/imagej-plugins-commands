@@ -35,6 +35,7 @@ import net.imagej.display.ImageDisplay;
 
 import org.scijava.command.Command;
 import org.scijava.command.CommandService;
+import org.scijava.plugin.Attr;
 import org.scijava.plugin.Menu;
 import org.scijava.plugin.Parameter;
 import org.scijava.plugin.Plugin;
@@ -46,7 +47,7 @@ import org.scijava.plugin.Plugin;
  */
 @Plugin(type = Command.class, menu = { @Menu(label = "Duplicate...",
 	mnemonic = 'd', accelerator = "shift ^D") },
-	menuRoot = ImageDisplay.CONTEXT_MENU_ROOT, headless = true)
+	menuRoot = ImageDisplay.CONTEXT_MENU_ROOT, headless = true, attrs = { @Attr(name = "no-legacy") })
 public class DuplicateImageContext implements Command {
 
 	// -- Parameters --

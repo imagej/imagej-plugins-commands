@@ -42,6 +42,7 @@ import org.scijava.ItemIO;
 import org.scijava.command.Command;
 import org.scijava.command.ContextCommand;
 import org.scijava.menu.MenuConstants;
+import org.scijava.plugin.Attr;
 import org.scijava.plugin.Menu;
 import org.scijava.plugin.Parameter;
 import org.scijava.plugin.Plugin;
@@ -59,7 +60,7 @@ import org.scijava.util.RealRect;
 	@Menu(label = MenuConstants.IMAGE_LABEL, weight = MenuConstants.IMAGE_WEIGHT,
 		mnemonic = MenuConstants.IMAGE_MNEMONIC),
 	@Menu(label = "Transform", mnemonic = 't'),
-	@Menu(label = "Rotate 90 Degrees Right", weight = 4) }, headless = true)
+	@Menu(label = "Rotate 90 Degrees Right", weight = 4) }, headless = true, attrs = { @Attr(name = "no-legacy") })
 public class Rotate90DegreesRight extends ContextCommand {
 
 	// -- instance variables that are Parameters --

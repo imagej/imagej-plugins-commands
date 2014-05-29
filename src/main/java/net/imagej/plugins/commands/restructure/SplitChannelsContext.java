@@ -38,6 +38,7 @@ import net.imagej.display.ImageDisplay;
 import org.scijava.command.Command;
 import org.scijava.command.CommandService;
 import org.scijava.command.ContextCommand;
+import org.scijava.plugin.Attr;
 import org.scijava.plugin.Menu;
 import org.scijava.plugin.Parameter;
 import org.scijava.plugin.Plugin;
@@ -48,7 +49,7 @@ import org.scijava.plugin.Plugin;
  * @author Curtis Rueden
  */
 @Plugin(type = Command.class, menu = { @Menu(label = "Split Channels",
-	mnemonic = 's') }, menuRoot = ImageDisplay.CONTEXT_MENU_ROOT, headless = true)
+	mnemonic = 's') }, menuRoot = ImageDisplay.CONTEXT_MENU_ROOT, headless = true, attrs = { @Attr(name = "no-legacy") })
 public class SplitChannelsContext extends ContextCommand {
 
 	// -- Parameters --

@@ -39,6 +39,7 @@ import org.scijava.command.Command;
 import org.scijava.command.ContextCommand;
 import org.scijava.menu.MenuConstants;
 import org.scijava.options.OptionsService;
+import org.scijava.plugin.Attr;
 import org.scijava.plugin.Menu;
 import org.scijava.plugin.Parameter;
 import org.scijava.plugin.Plugin;
@@ -57,7 +58,7 @@ import org.scijava.ui.UIService;
 	@Menu(label = MenuConstants.FILE_LABEL, weight = MenuConstants.FILE_WEIGHT,
 		mnemonic = MenuConstants.FILE_MNEMONIC),
 	@Menu(label = "Quit", weight = Double.MAX_VALUE, mnemonic = 'q',
-		accelerator = "^Q") })
+		accelerator = "^Q") }, attrs = { @Attr(name = "no-legacy") })
 public class QuitProgram extends ContextCommand {
 
 	public static final String MESSAGE = "Quit ImageJ?";

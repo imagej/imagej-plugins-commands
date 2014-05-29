@@ -37,6 +37,7 @@ import net.imglib2.type.numeric.real.DoubleType;
 
 import org.scijava.command.Command;
 import org.scijava.menu.MenuConstants;
+import org.scijava.plugin.Attr;
 import org.scijava.plugin.Menu;
 import org.scijava.plugin.Parameter;
 import org.scijava.plugin.Plugin;
@@ -52,7 +53,7 @@ import org.scijava.plugin.Plugin;
 		weight = MenuConstants.PROCESS_WEIGHT,
 		mnemonic = MenuConstants.PROCESS_MNEMONIC),
 	@Menu(label = "Math", mnemonic = 'm'),
-	@Menu(label = "Subtract...", weight = 2) }, headless = true)
+	@Menu(label = "Subtract...", weight = 2) }, headless = true, attrs = { @Attr(name = "no-legacy") })
 public class SubtractFromDataValues<T extends RealType<T>>
 	extends MathCommand<T,DoubleType>
 {

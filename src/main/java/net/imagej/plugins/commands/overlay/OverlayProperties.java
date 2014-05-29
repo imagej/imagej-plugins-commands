@@ -41,6 +41,7 @@ import net.imagej.overlay.Overlay;
 
 import org.scijava.command.Command;
 import org.scijava.menu.MenuConstants;
+import org.scijava.plugin.Attr;
 import org.scijava.plugin.Menu;
 import org.scijava.plugin.Parameter;
 import org.scijava.plugin.Plugin;
@@ -57,7 +58,7 @@ import org.scijava.plugin.Plugin;
 	@Menu(label = "Overlay", mnemonic = 'o'),
 	@Menu(label = "Properties...", mnemonic = 'p', weight = 5) },
 		headless = true,
-		initializer = "initialize")
+		initializer = "initialize", attrs = { @Attr(name = "no-legacy") })
 public class OverlayProperties extends AbstractOverlayProperties {
 
 	// -- parameters --

@@ -62,6 +62,7 @@ import org.scijava.display.Display;
 import org.scijava.display.DisplayService;
 import org.scijava.log.LogService;
 import org.scijava.menu.MenuConstants;
+import org.scijava.plugin.Attr;
 import org.scijava.plugin.Menu;
 import org.scijava.plugin.Parameter;
 import org.scijava.plugin.Plugin;
@@ -90,7 +91,7 @@ import org.scijava.util.MersenneTwisterFast;
 		@Menu(label = MenuConstants.HELP_LABEL,
 			weight = MenuConstants.HELP_WEIGHT,
 			mnemonic = MenuConstants.HELP_MNEMONIC),
-		@Menu(label = "About ImageJ...", weight = 43) }, headless = true)
+		@Menu(label = "About ImageJ...", weight = 43) }, headless = true, attrs = { @Attr(name = "no-legacy") })
 public class AboutImageJ extends ContextCommand {
 
 	// -- constants --

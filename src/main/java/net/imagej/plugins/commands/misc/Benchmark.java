@@ -36,6 +36,7 @@ import net.imagej.display.ImageDisplay;
 import org.scijava.command.Command;
 import org.scijava.command.UnimplementedCommand;
 import org.scijava.menu.MenuConstants;
+import org.scijava.plugin.Attr;
 import org.scijava.plugin.Menu;
 import org.scijava.plugin.Parameter;
 import org.scijava.plugin.Plugin;
@@ -56,7 +57,7 @@ import org.scijava.plugin.Plugin;
 		@Menu(label = MenuConstants.PLUGINS_LABEL,
 			weight = MenuConstants.PLUGINS_WEIGHT,
 			mnemonic = MenuConstants.PLUGINS_MNEMONIC), @Menu(label = "Utilities"),
-		@Menu(label = "Benchmark") })
+		@Menu(label = "Benchmark") }, attrs = { @Attr(name = "no-legacy") })
 public class Benchmark extends UnimplementedCommand {
 
 	// -- Parameters --

@@ -40,6 +40,7 @@ import org.scijava.ItemIO;
 import org.scijava.command.Command;
 import org.scijava.command.ContextCommand;
 import org.scijava.menu.MenuConstants;
+import org.scijava.plugin.Attr;
 import org.scijava.plugin.Menu;
 import org.scijava.plugin.Parameter;
 import org.scijava.plugin.Plugin;
@@ -83,7 +84,7 @@ import org.scijava.ui.viewer.DisplayWindow;
 			weight = MenuConstants.PLUGINS_WEIGHT,
 			mnemonic = MenuConstants.PLUGINS_MNEMONIC),
 	@Menu(label = "Utilities"),
-	@Menu(label = "Capture Image", weight = 21)})
+	@Menu(label = "Capture Image", weight = 21)}, attrs = { @Attr(name = "no-legacy") })
 public class CaptureImage extends ContextCommand {
 
 	// -- Parameters --

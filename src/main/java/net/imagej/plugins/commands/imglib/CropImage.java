@@ -51,6 +51,7 @@ import org.scijava.ItemIO;
 import org.scijava.command.Command;
 import org.scijava.command.ContextCommand;
 import org.scijava.menu.MenuConstants;
+import org.scijava.plugin.Attr;
 import org.scijava.plugin.Menu;
 import org.scijava.plugin.Parameter;
 import org.scijava.plugin.Plugin;
@@ -71,7 +72,7 @@ import org.scijava.util.RealRect;
 @Plugin(type = Command.class, menu = {
 	@Menu(label = MenuConstants.IMAGE_LABEL, weight = MenuConstants.IMAGE_WEIGHT,
 		mnemonic = MenuConstants.IMAGE_MNEMONIC),
-	@Menu(label = "Crop", accelerator = "shift ^X") }, headless = true)
+	@Menu(label = "Crop", accelerator = "shift ^X") }, headless = true, attrs = { @Attr(name = "no-legacy") })
 public class CropImage extends ContextCommand {
 
 	// -- instance variables that are Parameters --
