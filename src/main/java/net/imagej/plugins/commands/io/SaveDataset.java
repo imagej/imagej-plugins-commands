@@ -30,17 +30,11 @@
  */
 package net.imagej.plugins.commands.io;
 
-import java.io.IOException;
-
 import net.imagej.Dataset;
-import net.imagej.DatasetService;
 
 import org.scijava.command.Command;
-import org.scijava.command.ContextCommand;
-import org.scijava.log.LogService;
 import org.scijava.menu.MenuConstants;
 import org.scijava.plugin.Menu;
-import org.scijava.plugin.Parameter;
 import org.scijava.plugin.Plugin;
 
 /**
@@ -51,32 +45,6 @@ import org.scijava.plugin.Plugin;
 @Plugin(type = Command.class, menu = {
 	@Menu(label = MenuConstants.FILE_LABEL, weight = MenuConstants.FILE_WEIGHT),
 	@Menu(label = "Export"), @Menu(label = "Image...  ") })
-public class SaveDataset extends ContextCommand {
-
-	public static String DESTINATION_LABEL = "destination";
-
-	public static String SOURCE_LABEL = "source";
-
-	@Parameter
-	private DatasetService datasetService;
-
-	@Parameter
-	private LogService logService;
-
-	@Parameter(label = "destination")
-	private String destination;
-
-	@Parameter(label = "source")
-	private Dataset source;
-
-	@Override
-	public void run() {
-		try {
-			datasetService.save(source, destination);
-		}
-		catch (IOException e) {
-			logService.error(e);
-		}
-	}
-
+public class SaveDataset extends SaveAsImage {
+// Trivial extension. Just want a new menu path.
 }
