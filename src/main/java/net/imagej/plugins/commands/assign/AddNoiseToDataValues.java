@@ -44,6 +44,7 @@ import org.scijava.ItemIO;
 import org.scijava.command.Command;
 import org.scijava.command.ContextCommand;
 import org.scijava.menu.MenuConstants;
+import org.scijava.plugin.Attr;
 import org.scijava.plugin.Menu;
 import org.scijava.plugin.Parameter;
 import org.scijava.plugin.Plugin;
@@ -59,7 +60,7 @@ import org.scijava.plugin.Plugin;
 		weight = MenuConstants.PROCESS_WEIGHT,
 		mnemonic = MenuConstants.PROCESS_MNEMONIC),
 	@Menu(label = "Noise", mnemonic = 'n'),
-	@Menu(label = "Add Noise...", weight = 1) }, headless = true)
+	@Menu(label = "Add Noise...", weight = 1) }, headless = true, attrs = { @Attr(name = "no-legacy") })
 public class AddNoiseToDataValues<T extends RealType<T>>
 	extends ContextCommand
 {

@@ -33,6 +33,7 @@ package net.imagej.plugins.commands.app;
 
 import org.scijava.command.Command;
 import org.scijava.menu.MenuConstants;
+import org.scijava.plugin.Attr;
 import org.scijava.plugin.Menu;
 import org.scijava.plugin.Parameter;
 import org.scijava.plugin.Plugin;
@@ -46,7 +47,7 @@ import org.scijava.util.Prefs;
 @Plugin(type = Command.class, label = "Preferences", menu = {
 	@Menu(label = MenuConstants.FILE_LABEL, weight = MenuConstants.FILE_WEIGHT,
 		mnemonic = MenuConstants.FILE_MNEMONIC),
-	@Menu(label = "Preferences", weight = 30) }, headless = true)
+	@Menu(label = "Preferences", weight = 30) }, headless = true, attrs = { @Attr(name = "no-legacy") })
 public class Preferences implements Command {
 
 	@Parameter(label = "Clear all preferences")

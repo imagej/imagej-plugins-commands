@@ -55,6 +55,7 @@ import org.scijava.command.Command;
 import org.scijava.command.InteractiveCommand;
 import org.scijava.event.EventHandler;
 import org.scijava.module.MutableModuleItem;
+import org.scijava.plugin.Attr;
 import org.scijava.plugin.Menu;
 import org.scijava.plugin.Parameter;
 import org.scijava.plugin.Plugin;
@@ -81,7 +82,7 @@ import org.scijava.widget.Button;
  * @author Barry DeZonia
  */
 @Plugin(type = Command.class, menu = { @Menu(label = "Analyze"),
-	@Menu(label = "Histogram Plot", accelerator = "shift alt ^H", weight = 0) })
+	@Menu(label = "Histogram Plot", accelerator = "shift alt ^H", weight = 0) }, attrs = { @Attr(name = "no-legacy") })
 public class HistogramPlot<T extends RealType<T>> extends InteractiveCommand
 {
 

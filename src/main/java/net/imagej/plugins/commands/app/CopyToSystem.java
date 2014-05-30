@@ -41,6 +41,7 @@ import org.scijava.app.StatusService;
 import org.scijava.command.Command;
 import org.scijava.command.ContextCommand;
 import org.scijava.menu.MenuConstants;
+import org.scijava.plugin.Attr;
 import org.scijava.plugin.Menu;
 import org.scijava.plugin.Parameter;
 import org.scijava.plugin.Plugin;
@@ -57,7 +58,7 @@ import org.scijava.ui.UserInterface;
 @Plugin(type = Command.class, menu = {
 		@Menu(label = MenuConstants.EDIT_LABEL, weight = MenuConstants.EDIT_WEIGHT,
 			mnemonic = MenuConstants.EDIT_MNEMONIC),
-		@Menu(label = "Copy To System", weight = 12) })
+		@Menu(label = "Copy To System", weight = 12) }, attrs = { @Attr(name = "no-legacy") })
 public class CopyToSystem extends ContextCommand {
 
 	@Parameter

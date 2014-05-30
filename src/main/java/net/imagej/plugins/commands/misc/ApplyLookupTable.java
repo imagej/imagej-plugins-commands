@@ -50,6 +50,7 @@ import org.scijava.ItemIO;
 import org.scijava.command.Command;
 import org.scijava.display.DisplayService;
 import org.scijava.log.LogService;
+import org.scijava.plugin.Attr;
 import org.scijava.plugin.Parameter;
 import org.scijava.plugin.Plugin;
 
@@ -64,7 +65,7 @@ import org.scijava.plugin.Plugin;
  * 
  * @author Barry DeZonia
  */
-@Plugin(type = Command.class)
+@Plugin(type = Command.class, attrs = { @Attr(name = "no-legacy") })
 public class ApplyLookupTable implements Command {
 
 	// -- Parameters --

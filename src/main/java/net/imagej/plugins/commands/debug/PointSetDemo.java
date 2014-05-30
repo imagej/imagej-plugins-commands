@@ -45,6 +45,7 @@ import org.scijava.Cancelable;
 import org.scijava.ItemIO;
 import org.scijava.command.Command;
 import org.scijava.platform.PlatformService;
+import org.scijava.plugin.Attr;
 import org.scijava.plugin.Parameter;
 import org.scijava.plugin.Plugin;
 import org.scijava.widget.Button;
@@ -54,7 +55,7 @@ import org.scijava.widget.Button;
  * 
  * @author Barry DeZonia
  */
-@Plugin(type = Command.class, menuPath = "Plugins>Sandbox>PointSet Demo")
+@Plugin(type = Command.class, menuPath = "Plugins>Sandbox>PointSet Demo", attrs = { @Attr(name = "no-legacy") })
 public class PointSetDemo implements Command, Cancelable {
 
 	@Parameter

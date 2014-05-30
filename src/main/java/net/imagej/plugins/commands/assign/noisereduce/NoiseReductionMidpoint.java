@@ -39,6 +39,7 @@ import net.imglib2.type.numeric.real.DoubleType;
 
 import org.scijava.command.Command;
 import org.scijava.menu.MenuConstants;
+import org.scijava.plugin.Attr;
 import org.scijava.plugin.Menu;
 import org.scijava.plugin.Plugin;
 
@@ -53,7 +54,7 @@ import org.scijava.plugin.Plugin;
 		weight = MenuConstants.PROCESS_WEIGHT,
 		mnemonic = MenuConstants.PROCESS_MNEMONIC),
 	@Menu(label = "Noise", mnemonic = 'n'),
-	@Menu(label = "Noise Reduction", mnemonic = 'r'), @Menu(label = "Midpoint") }, headless = true)
+	@Menu(label = "Noise Reduction", mnemonic = 'r'), @Menu(label = "Midpoint") }, headless = true, attrs = { @Attr(name = "no-legacy") })
 public class NoiseReductionMidpoint<T extends RealType<T>> extends
 	AbstractNoiseReducerPlugin<T>
 {

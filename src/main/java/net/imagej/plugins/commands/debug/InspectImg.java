@@ -36,6 +36,7 @@ import com.github.sbridges.objectinspector.Inspector;
 import net.imagej.display.DataView;
 
 import org.scijava.command.Command;
+import org.scijava.plugin.Attr;
 import org.scijava.plugin.Parameter;
 import org.scijava.plugin.Plugin;
 
@@ -44,7 +45,7 @@ import org.scijava.plugin.Plugin;
  * 
  * @author Grant Harris
  */
-@Plugin(type = Command.class, menuPath = "Plugins>Debug>Inspect Image", headless = true)
+@Plugin(type = Command.class, menuPath = "Plugins>Debug>Inspect Image", headless = true, attrs = { @Attr(name = "no-legacy") })
 public class InspectImg implements Command {
 
 	@Parameter

@@ -35,6 +35,7 @@ import net.imagej.Dataset;
 
 import org.scijava.ItemIO;
 import org.scijava.command.Command;
+import org.scijava.plugin.Attr;
 import org.scijava.plugin.Parameter;
 import org.scijava.plugin.Plugin;
 
@@ -45,7 +46,7 @@ import org.scijava.plugin.Plugin;
  * 
  * @author Barry DeZonia
  */
-@Plugin(type = Command.class, headless = true)
+@Plugin(type = Command.class, headless = true, attrs = { @Attr(name = "no-legacy") })
 public class LoadDataset implements Command {
 
 	@Parameter(type=ItemIO.BOTH)

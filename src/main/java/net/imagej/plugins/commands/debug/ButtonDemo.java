@@ -38,6 +38,7 @@ import net.imglib2.ops.operation.real.unary.RealAddConstant;
 import net.imglib2.ops.operation.real.unary.RealSubtractConstant;
 
 import org.scijava.command.Command;
+import org.scijava.plugin.Attr;
 import org.scijava.plugin.Parameter;
 import org.scijava.plugin.Plugin;
 import org.scijava.util.TunePlayer;
@@ -49,7 +50,7 @@ import org.scijava.widget.Button;
  * 
  * @author Barry DeZonia
  */
-@Plugin(type = Command.class, menuPath = "Plugins>Sandbox>Button Demo")
+@Plugin(type = Command.class, menuPath = "Plugins>Sandbox>Button Demo", attrs = { @Attr(name = "no-legacy") })
 public class ButtonDemo implements Command {
 
 	@Parameter

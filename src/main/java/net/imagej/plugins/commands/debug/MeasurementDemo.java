@@ -70,6 +70,7 @@ import net.imglib2.type.numeric.real.DoubleType;
 
 import org.scijava.app.StatusService;
 import org.scijava.command.Command;
+import org.scijava.plugin.Attr;
 import org.scijava.plugin.Parameter;
 import org.scijava.plugin.Plugin;
 import org.scijava.widget.Button;
@@ -80,7 +81,7 @@ import org.scijava.widget.Button;
  * @author Barry DeZonia
  *
  */
-@Plugin(type = Command.class, menuPath = "Plugins>Sandbox>Measurement Demo")
+@Plugin(type = Command.class, menuPath = "Plugins>Sandbox>Measurement Demo", attrs = { @Attr(name = "no-legacy") })
 public class MeasurementDemo implements Command {
 
 	// -- Parameters --

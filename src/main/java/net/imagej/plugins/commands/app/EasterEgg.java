@@ -38,6 +38,7 @@ import net.imglib2.type.numeric.RealType;
 
 import org.scijava.ItemIO;
 import org.scijava.command.Command;
+import org.scijava.plugin.Attr;
 import org.scijava.plugin.Parameter;
 import org.scijava.plugin.Plugin;
 
@@ -46,7 +47,7 @@ import org.scijava.plugin.Plugin;
  * 
  * @author Curtis Rueden
  */
-@Plugin(type = Command.class, label = "| It's a secret to everyone |", headless = true)
+@Plugin(type = Command.class, label = "| It's a secret to everyone |", headless = true, attrs = { @Attr(name = "no-legacy") })
 public class EasterEgg implements Command {
 
 	private static final String CHARS = "#O*o+-,. ";

@@ -45,6 +45,7 @@ import org.scijava.ItemIO;
 import org.scijava.command.Command;
 import org.scijava.command.ContextCommand;
 import org.scijava.menu.MenuConstants;
+import org.scijava.plugin.Attr;
 import org.scijava.plugin.Menu;
 import org.scijava.plugin.Parameter;
 import org.scijava.plugin.Plugin;
@@ -60,7 +61,7 @@ import org.scijava.plugin.Plugin;
 		weight = MenuConstants.PROCESS_WEIGHT,
 		mnemonic = MenuConstants.PROCESS_MNEMONIC),
 	@Menu(label = "Math", mnemonic = 'm'),
-	@Menu(label = "Square Root...", weight = 16) }, headless = true)
+	@Menu(label = "Square Root...", weight = 16) }, headless = true, attrs = { @Attr(name = "no-legacy") })
 public class SquareRootDataValues<T extends RealType<T>>
 	extends ContextCommand
 {

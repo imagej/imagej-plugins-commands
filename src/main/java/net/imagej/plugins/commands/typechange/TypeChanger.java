@@ -57,6 +57,7 @@ import org.scijava.command.Command;
 import org.scijava.command.DynamicCommand;
 import org.scijava.menu.MenuConstants;
 import org.scijava.module.MutableModuleItem;
+import org.scijava.plugin.Attr;
 import org.scijava.plugin.Menu;
 import org.scijava.plugin.Parameter;
 import org.scijava.plugin.Plugin;
@@ -78,7 +79,7 @@ import org.scijava.plugin.Plugin;
 			mnemonic = MenuConstants.IMAGE_MNEMONIC),
 		@Menu(label = "Type", mnemonic = 't'),
 	@Menu(label = "Change...", mnemonic = 'c') },
-	headless = true)
+	headless = true, attrs = { @Attr(name = "no-legacy") })
 public class TypeChanger<U extends RealType<U>, V extends RealType<V> & NativeType<V>>
 	extends DynamicCommand
 {

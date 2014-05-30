@@ -47,6 +47,7 @@ import org.scijava.command.Command;
 import org.scijava.command.ContextCommand;
 import org.scijava.menu.MenuConstants;
 import org.scijava.options.OptionsService;
+import org.scijava.plugin.Attr;
 import org.scijava.plugin.Menu;
 import org.scijava.plugin.Parameter;
 import org.scijava.plugin.Plugin;
@@ -62,7 +63,7 @@ import org.scijava.plugin.Plugin;
 		weight = MenuConstants.PROCESS_WEIGHT,
 		mnemonic = MenuConstants.PROCESS_MNEMONIC),
 	@Menu(label = "Math", mnemonic = 'm'),
-	@Menu(label = "Reciprocal...", weight = 17) }, headless = true)
+	@Menu(label = "Reciprocal...", weight = 17) }, headless = true, attrs = { @Attr(name = "no-legacy") })
 public class ReciprocalDataValues<T extends RealType<T>>
 	extends ContextCommand
 {

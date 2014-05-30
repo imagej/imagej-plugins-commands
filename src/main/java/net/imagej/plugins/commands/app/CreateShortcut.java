@@ -34,6 +34,7 @@ package net.imagej.plugins.commands.app;
 import org.scijava.command.Command;
 import org.scijava.command.UnimplementedCommand;
 import org.scijava.menu.MenuConstants;
+import org.scijava.plugin.Attr;
 import org.scijava.plugin.Menu;
 import org.scijava.plugin.Plugin;
 
@@ -53,7 +54,7 @@ import org.scijava.plugin.Plugin;
 		@Menu(label = MenuConstants.PLUGINS_LABEL,
 			weight = MenuConstants.PLUGINS_WEIGHT,
 			mnemonic = MenuConstants.PLUGINS_MNEMONIC), @Menu(label = "Shortcuts"),
-		@Menu(label = "Create Shortcut...", weight = 2) })
+		@Menu(label = "Create Shortcut...", weight = 2) }, attrs = { @Attr(name = "no-legacy") })
 public class CreateShortcut extends UnimplementedCommand {
 	// TODO
 }

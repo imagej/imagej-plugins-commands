@@ -34,6 +34,7 @@ package net.imagej.plugins.commands.assign.noisereduce;
 import org.scijava.ItemIO;
 import org.scijava.command.Command;
 import org.scijava.command.ContextCommand;
+import org.scijava.plugin.Attr;
 import org.scijava.plugin.Parameter;
 import org.scijava.plugin.Plugin;
 
@@ -42,7 +43,7 @@ import org.scijava.plugin.Plugin;
  * 
  * @author Barry DeZonia
  */
-@Plugin(type = Command.class, label="Radial Neighborhood Specification")
+@Plugin(type = Command.class, label="Radial Neighborhood Specification", attrs = { @Attr(name = "no-legacy") })
 public class RadialNeighborhoodSpecifier extends ContextCommand {
 	
 	@Parameter(label = "Dimensionality")

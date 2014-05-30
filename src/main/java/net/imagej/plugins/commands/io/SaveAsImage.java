@@ -43,6 +43,7 @@ import org.scijava.command.ContextCommand;
 import org.scijava.display.Display;
 import org.scijava.log.LogService;
 import org.scijava.menu.MenuConstants;
+import org.scijava.plugin.Attr;
 import org.scijava.plugin.Menu;
 import org.scijava.plugin.Parameter;
 import org.scijava.plugin.Plugin;
@@ -59,7 +60,7 @@ import org.scijava.widget.FileWidget;
 @Plugin(type = Command.class, menu = {
 	@Menu(label = MenuConstants.FILE_LABEL, weight = MenuConstants.FILE_WEIGHT,
 		mnemonic = MenuConstants.FILE_MNEMONIC),
-	@Menu(label = "Save As...", weight = 21, accelerator = "shift ^S") })
+	@Menu(label = "Save As...", weight = 21, accelerator = "shift ^S") }, attrs = { @Attr(name = "no-legacy") })
 public class SaveAsImage extends ContextCommand {
 
 	@Parameter

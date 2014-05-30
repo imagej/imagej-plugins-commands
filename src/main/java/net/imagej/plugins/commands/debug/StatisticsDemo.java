@@ -42,6 +42,7 @@ import net.imglib2.ops.pointset.RoiPointSet;
 
 import org.scijava.app.StatusService;
 import org.scijava.command.Command;
+import org.scijava.plugin.Attr;
 import org.scijava.plugin.Parameter;
 import org.scijava.plugin.Plugin;
 import org.scijava.widget.Button;
@@ -52,7 +53,7 @@ import org.scijava.widget.Button;
  * @author Barry DeZonia
  *
  */
-@Plugin(type = Command.class, menuPath = "Plugins>Sandbox>Statistics Demo")
+@Plugin(type = Command.class, menuPath = "Plugins>Sandbox>Statistics Demo", attrs = { @Attr(name = "no-legacy") })
 public class StatisticsDemo implements Command {
 
 	// -- Parameters --

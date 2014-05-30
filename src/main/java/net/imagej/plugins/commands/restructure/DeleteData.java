@@ -46,6 +46,7 @@ import org.scijava.command.Command;
 import org.scijava.command.DynamicCommand;
 import org.scijava.menu.MenuConstants;
 import org.scijava.module.MutableModuleItem;
+import org.scijava.plugin.Attr;
 import org.scijava.plugin.Menu;
 import org.scijava.plugin.Parameter;
 import org.scijava.plugin.Plugin;
@@ -61,7 +62,7 @@ import org.scijava.plugin.Plugin;
 		weight = MenuConstants.IMAGE_WEIGHT,
 		mnemonic = MenuConstants.IMAGE_MNEMONIC),
 	@Menu(label = "Data", mnemonic = 'd'), @Menu(label = "Delete Data...") },
-	headless = true, initializer = "initAll")
+	headless = true, initializer = "initAll", attrs = { @Attr(name = "no-legacy") })
 public class DeleteData extends DynamicCommand {
 
 	// -- Constants --

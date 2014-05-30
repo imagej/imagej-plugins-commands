@@ -52,6 +52,7 @@ import org.scijava.ItemIO;
 import org.scijava.command.Command;
 import org.scijava.command.ContextCommand;
 import org.scijava.menu.MenuConstants;
+import org.scijava.plugin.Attr;
 import org.scijava.plugin.Menu;
 import org.scijava.plugin.Parameter;
 import org.scijava.plugin.Plugin;
@@ -67,7 +68,7 @@ import org.scijava.plugin.Plugin;
 		mnemonic = MenuConstants.PROCESS_MNEMONIC),
 	@Menu(label = "Noise", mnemonic = 'n'),
 	@Menu(label = "Noise Reduction", mnemonic = 'r'),
-	@Menu(label = "Adaptive Median") }, headless = true)
+	@Menu(label = "Adaptive Median") }, headless = true, attrs = { @Attr(name = "no-legacy") })
 public class NoiseReductionAdaptiveMedian<U extends RealType<U>> extends
 	ContextCommand
 {

@@ -36,6 +36,7 @@ import java.util.List;
 import net.imagej.overlay.Overlay;
 
 import org.scijava.command.Command;
+import org.scijava.plugin.Attr;
 import org.scijava.plugin.Parameter;
 import org.scijava.plugin.Plugin;
 
@@ -47,7 +48,7 @@ import org.scijava.plugin.Plugin;
  * 
  * @author Barry DeZonia
  */
-@Plugin(type = Command.class, headless = true, initializer = "initialize")
+@Plugin(type = Command.class, headless = true, initializer = "initialize", attrs = { @Attr(name = "no-legacy") })
 public class SelectedManagerOverlayProperties extends AbstractOverlayProperties {
 
 	// -- Parameters --

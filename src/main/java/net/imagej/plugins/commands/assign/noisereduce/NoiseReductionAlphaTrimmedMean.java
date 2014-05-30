@@ -39,6 +39,7 @@ import net.imglib2.type.numeric.real.DoubleType;
 
 import org.scijava.command.Command;
 import org.scijava.menu.MenuConstants;
+import org.scijava.plugin.Attr;
 import org.scijava.plugin.Menu;
 import org.scijava.plugin.Parameter;
 import org.scijava.plugin.Plugin;
@@ -55,7 +56,7 @@ import org.scijava.plugin.Plugin;
 		mnemonic = MenuConstants.PROCESS_MNEMONIC),
 	@Menu(label = "Noise", mnemonic = 'n'),
 	@Menu(label = "Noise Reduction", mnemonic = 'r'),
-	@Menu(label = "Alpha Trimmed Mean", mnemonic = 'a')}, headless = true)
+	@Menu(label = "Alpha Trimmed Mean", mnemonic = 'a')}, headless = true, attrs = { @Attr(name = "no-legacy") })
 public class NoiseReductionAlphaTrimmedMean<T extends RealType<T>> extends
 	AbstractNoiseReducerPlugin<T>
 {

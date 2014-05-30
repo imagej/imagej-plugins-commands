@@ -37,6 +37,7 @@ import net.imagej.display.ImageDisplay;
 import org.scijava.command.Command;
 import org.scijava.command.ContextCommand;
 import org.scijava.menu.MenuConstants;
+import org.scijava.plugin.Attr;
 import org.scijava.plugin.Menu;
 import org.scijava.plugin.Parameter;
 import org.scijava.plugin.Plugin;
@@ -54,7 +55,7 @@ import org.scijava.plugin.Plugin;
 	@Menu(label = MenuConstants.IMAGE_LABEL, weight = MenuConstants.IMAGE_WEIGHT,
 		mnemonic = MenuConstants.IMAGE_MNEMONIC),
 	@Menu(label = "Animation", mnemonic = 'a'),
-	@Menu(label = "Start Animation", accelerator = "BACK_SLASH", weight = 1) })
+	@Menu(label = "Start Animation", accelerator = "BACK_SLASH", weight = 1) }, attrs = { @Attr(name = "no-legacy") })
 public class StartAnimation extends ContextCommand {
 
 	// -- Parameters --
