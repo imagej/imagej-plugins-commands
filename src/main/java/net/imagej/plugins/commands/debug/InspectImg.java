@@ -31,14 +31,14 @@
 
 package net.imagej.plugins.commands.debug;
 
-import com.github.sbridges.objectinspector.Inspector;
-
 import net.imagej.display.DataView;
 
 import org.scijava.command.Command;
 import org.scijava.plugin.Attr;
 import org.scijava.plugin.Parameter;
 import org.scijava.plugin.Plugin;
+
+import com.github.sbridges.objectinspector.Inspector;
 
 /**
  * TODO

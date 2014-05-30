@@ -33,8 +33,6 @@ package net.imagej.plugins.commands.upload;
 
 import java.io.File;
 
-import net.imagej.plugins.commands.upload.SampleImageUploader;
-
 import org.scijava.Context;
 import org.scijava.app.StatusService;
 import org.scijava.app.event.StatusEvent;
