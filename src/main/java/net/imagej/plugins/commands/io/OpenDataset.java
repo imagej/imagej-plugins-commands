@@ -53,6 +53,8 @@ import org.scijava.menu.MenuConstants;
 import org.scijava.plugin.Menu;
 import org.scijava.plugin.Parameter;
 import org.scijava.plugin.Plugin;
+import org.scijava.ui.DialogPrompt;
+import org.scijava.ui.UIService;
 
 /**
  * {@link Command} for opening a given {@code File} as a {@link Dataset}.
@@ -71,6 +73,9 @@ public class OpenDataset extends ContextCommand {
 
 	@Parameter
 	private LogService logService;
+
+	@Parameter
+	private UIService uiService;
 
 	@Parameter(visibility = ItemVisibility.MESSAGE, persist = false,
 		required = false, initializer = "setHeader")
@@ -103,9 +108,6 @@ public class OpenDataset extends ContextCommand {
 
 	@Parameter(type = ItemIO.OUTPUT)
 	private Dataset dataset;
-
-	@Parameter(type = ItemIO.OUTPUT)
-	private IOException error;
 
 	@Override
 	public void run() {
@@ -144,8 +146,8 @@ public class OpenDataset extends ContextCommand {
 			dataset = datasetService.open(source.getAbsolutePath(), config);
 		}
 		catch (IOException e) {
-			error = e;
 			logService.error(e);
+			error(e.getMessage());
 		}
 	}
 
@@ -172,5 +174,11 @@ public class OpenDataset extends ContextCommand {
 				header = id;
 			}
 		}
+	}
+
+	// -- Helper methods --
+
+	private void error(final String message) {
+		uiService.showDialog(message, DialogPrompt.MessageType.ERROR_MESSAGE);
 	}
 }
