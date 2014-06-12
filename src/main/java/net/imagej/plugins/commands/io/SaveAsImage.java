@@ -83,6 +83,7 @@ public class SaveAsImage extends ContextCommand {
 	private Display<?> display;
 
 	protected void initOutputFile() {
+		if (dataset == null) return;
 		outputFile = new File(dataset.getImgPlus().getSource());
 	}
 
