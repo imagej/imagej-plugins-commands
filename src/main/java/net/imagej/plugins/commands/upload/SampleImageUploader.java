@@ -107,9 +107,13 @@ public class SampleImageUploader implements Command {
 		}
 		try {
 			uploadFile(sampleImage);
+			ui.showDialog("Finished uploading file: " + sampleImage,
+				"Upload complete!");
 		}
 		catch (Exception e) {
 			log.error(e);
+			ui.showDialog("There was a problem uploading file: " + sampleImage +
+				"\nSee the log for details.", "Upload failed");
 		}
 	}
 
