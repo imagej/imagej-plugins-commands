@@ -90,8 +90,8 @@ import org.scijava.util.MersenneTwisterFast;
 	iconPath = "/icons/commands/information.png", menu = {
 		@Menu(label = MenuConstants.HELP_LABEL, weight = MenuConstants.HELP_WEIGHT,
 			mnemonic = MenuConstants.HELP_MNEMONIC),
-		@Menu(label = "About ImageJ...", weight = 43) }, headless = true,
-	attrs = { @Attr(name = "no-legacy") })
+		@Menu(label = "About ImageJ...", weight = 43) }, headless = true, attrs = {
+		@Attr(name = "no-legacy"), @Attr(name = "app-command") })
 public class AboutImageJ extends ContextCommand {
 
 	// -- constants --

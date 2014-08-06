@@ -58,7 +58,8 @@ import org.scijava.ui.UIService;
 		@Menu(label = MenuConstants.FILE_LABEL, weight = MenuConstants.FILE_WEIGHT,
 			mnemonic = MenuConstants.FILE_MNEMONIC),
 		@Menu(label = "Quit", weight = Double.MAX_VALUE, mnemonic = 'q',
-			accelerator = "^Q") }, attrs = { @Attr(name = "no-legacy") })
+			accelerator = "^Q") }, attrs = { @Attr(name = "no-legacy"),
+		@Attr(name = "app-command") })
 public class QuitProgram extends ContextCommand {
 
 	public static final String MESSAGE = "Quit ImageJ?";
