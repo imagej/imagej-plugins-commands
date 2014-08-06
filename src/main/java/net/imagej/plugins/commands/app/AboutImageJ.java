@@ -151,7 +151,7 @@ public class AboutImageJ extends ContextCommand {
 		final File imageFile = getRandomAboutImagePath();
 		final String source = imageFile != null ?
 				imageFile.getAbsolutePath() :
-				"About ImageJ&pixelType=uint16&sizeC=3&sizeX=512&sizeY=512.fake";
+				"About ImageJ&pixelType=uint16&axisTypes=X,Y&axisLengths=512,512.fake";
 
 		final String title = "About " + getAppString();
 
