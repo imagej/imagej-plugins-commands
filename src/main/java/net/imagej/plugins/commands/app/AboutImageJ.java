@@ -88,10 +88,10 @@ import org.scijava.util.MersenneTwisterFast;
  */
 @Plugin(type = Command.class, label = "About ImageJ...",
 	iconPath = "/icons/commands/information.png", menu = {
-		@Menu(label = MenuConstants.HELP_LABEL,
-			weight = MenuConstants.HELP_WEIGHT,
+		@Menu(label = MenuConstants.HELP_LABEL, weight = MenuConstants.HELP_WEIGHT,
 			mnemonic = MenuConstants.HELP_MNEMONIC),
-		@Menu(label = "About ImageJ...", weight = 43) }, headless = true, attrs = { @Attr(name = "no-legacy") })
+		@Menu(label = "About ImageJ...", weight = 43) }, headless = true,
+	attrs = { @Attr(name = "no-legacy") })
 public class AboutImageJ extends ContextCommand {
 
 	// -- constants --

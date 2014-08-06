@@ -47,7 +47,8 @@ import org.scijava.util.Prefs;
 @Plugin(type = Command.class, label = "Preferences", menu = {
 	@Menu(label = MenuConstants.FILE_LABEL, weight = MenuConstants.FILE_WEIGHT,
 		mnemonic = MenuConstants.FILE_MNEMONIC),
-	@Menu(label = "Preferences", weight = 30) }, headless = true, attrs = { @Attr(name = "no-legacy") })
+	@Menu(label = "Preferences", weight = 30) }, headless = true,
+	attrs = { @Attr(name = "no-legacy") })
 public class Preferences implements Command {
 
 	@Parameter(label = "Clear all preferences")

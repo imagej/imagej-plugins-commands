@@ -55,10 +55,10 @@ import org.scijava.ui.UIService;
  */
 @Plugin(type = Command.class, label = "Quit",
 	iconPath = "/icons/commands/door_in.png", menu = {
-	@Menu(label = MenuConstants.FILE_LABEL, weight = MenuConstants.FILE_WEIGHT,
-		mnemonic = MenuConstants.FILE_MNEMONIC),
-	@Menu(label = "Quit", weight = Double.MAX_VALUE, mnemonic = 'q',
-		accelerator = "^Q") }, attrs = { @Attr(name = "no-legacy") })
+		@Menu(label = MenuConstants.FILE_LABEL, weight = MenuConstants.FILE_WEIGHT,
+			mnemonic = MenuConstants.FILE_MNEMONIC),
+		@Menu(label = "Quit", weight = Double.MAX_VALUE, mnemonic = 'q',
+			accelerator = "^Q") }, attrs = { @Attr(name = "no-legacy") })
 public class QuitProgram extends ContextCommand {
 
 	public static final String MESSAGE = "Quit ImageJ?";
