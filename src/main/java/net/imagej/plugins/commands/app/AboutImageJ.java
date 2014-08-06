@@ -94,11 +94,6 @@ import org.scijava.util.MersenneTwisterFast;
 		@Attr(name = "no-legacy"), @Attr(name = "app-command") })
 public class AboutImageJ extends ContextCommand {
 
-	// -- constants --
-
-	private static final long ONE_K_BYTES = 1024;
-	private static final long ONE_M_BYTES = ONE_K_BYTES * ONE_K_BYTES;
-
 	// -- parameters --
 
 	@Parameter
@@ -288,56 +283,10 @@ public class AboutImageJ extends ContextCommand {
 		stringList.add("Open source image processing software");
 		final int year = Calendar.getInstance().get(Calendar.YEAR);
 		stringList.add("Copyright 2010 - " + year);
-		stringList.add("http://developer.imagej.net/");
-		stringList.add(javaInfo());
-		stringList.add(memoryInfo());
+		stringList.add("http://imagej.net/Contributors");
 		stringList.addAll(attributionStrings);
 
 		return stringList;
-	}
-
-	/**
-	 * Returns a string showing java platform and version information.
-	 */
-	private String javaInfo() {
-		return "Java " + System.getProperty("java.version") +
-			(is64Bit() ? " (64-bit)" : " (32-bit)");
-	}
-
-	// NB - this code used to mirror IJ1 more closely. It figured max memory from
-	// the setting in OptionsMemoryAndThreads. But then it was possible to have
-	// different reports when double clicking the status area vs. running the
-	// about dialog. This code now matches SwingStatusBar's method.
-
-	// TODO We should make a centralized memory reporter that depends upon
-	// ij-options that this class and SwingStatusBar use. Then we can decide
-	// whether to emulate IJ1's memory option constraint. Or if we'll instead
-	// rely on launcher to constrain memory. Either way the two will be consistent
-
-	/**
-	 * Returns a string showing used and available memory information.
-	 */
-	private String memoryInfo() {
-		final long maxMem = Runtime.getRuntime().maxMemory();
-		final long totalMem = Runtime.getRuntime().totalMemory();
-		final long freeMem = Runtime.getRuntime().freeMemory();
-		final long usedMem = totalMem - freeMem;
-		final long maxMB = maxMem / ONE_M_BYTES;
-		String inUseStr =
-			(usedMem < 10000 * ONE_K_BYTES) ? (usedMem / ONE_K_BYTES + "K")
-				: (usedMem / ONE_M_BYTES + "MB");
-		if (maxMem > 0L) {
-			final long percent = usedMem * 100 / maxMem;
-			inUseStr +=
-				" of " + maxMB + "MB (" + (percent < 1 ? "<1" : percent) + "%)";
-		}
-		return inUseStr;
-	}
-
-	/** Returns true if ImageJ is running a 64-bit version of Java. */
-	private boolean is64Bit() {
-		final String osarch = System.getProperty("os.arch");
-		return osarch != null && osarch.indexOf("64") != -1;
 	}
 
 	/**
@@ -405,7 +354,7 @@ public class AboutImageJ extends ContextCommand {
 	}
 
 	private App getApp() {
-		return appService.getApp(ImageJApp.NAME);
+		return appService.getApp();
 	}
 
 }
