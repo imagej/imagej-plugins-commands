@@ -147,7 +147,7 @@ public class AboutImageJ extends ContextCommand {
 				imageFile.getAbsolutePath() :
 				"About ImageJ&pixelType=uint16&axisTypes=X,Y&axisLengths=512,512.fake";
 
-		final String title = "About " + getAppString();
+		final String title = "About " + getApp().getTitle();
 
 		Dataset ds = null;
 		try {
@@ -237,7 +237,7 @@ public class AboutImageJ extends ContextCommand {
 		tool.setTextAntialiasing(true);
 		// tool.setTextOutlineWidth(5);
 		tool.setFontSize(largestFontSize);
-		drawOutlinedText(tool, x, y, getAppString(),
+		drawOutlinedText(tool, x, y, getApp().getTitle(),
 			TextJustification.CENTER, textChannels, outlineChannels);
 		y += 5 * tool.getFontSize() / 4;
 		tool.setFontSize((int) Math.round(0.6 * largestFontSize));
@@ -274,6 +274,7 @@ public class AboutImageJ extends ContextCommand {
 		final Manifest mft = getApp().getManifest();
 
 		final LinkedList<String> stringList = new LinkedList<String>();
+		stringList.add("Version: " + getApp().getVersion());
 		if (mft != null) {
 			final String build = mft.getImplementationBuild();
 			stringList.add("Build: " + (build == null || build.length() < 10 ? build : build.substring(0, 10)));
@@ -346,10 +347,6 @@ public class AboutImageJ extends ContextCommand {
 				// do nothing
 			}
 		}
-	}
-
-	private String getAppString() {
-		return getApp().getTitle() + " " + getApp().getVersion();
 	}
 
 	private App getApp() {
