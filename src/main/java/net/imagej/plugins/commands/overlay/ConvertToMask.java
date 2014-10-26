@@ -41,12 +41,13 @@ import net.imagej.threshold.ThresholdService;
 import net.imglib2.RandomAccess;
 import net.imglib2.img.Img;
 import net.imglib2.img.array.ArrayImg;
-import net.imglib2.img.array.ArrayImgFactory;
-import net.imglib2.img.basictypeaccess.array.BitArray;
-import net.imglib2.img.transform.ImgTranslationAdapter;
+import net.imglib2.img.array.ArrayImgs;
+import net.imglib2.img.basictypeaccess.array.LongArray;
 import net.imglib2.ops.pointset.PointSetIterator;
 import net.imglib2.roi.BinaryMaskRegionOfInterest;
 import net.imglib2.type.logic.BitType;
+import net.imglib2.view.IntervalView;
+import net.imglib2.view.Views;
 
 import org.scijava.Context;
 import org.scijava.ItemIO;
@@ -165,13 +166,10 @@ public class ConvertToMask extends ContextCommand {
 			dimensions[i] =
 				(long) Math.floor(thresh.realMax(i) - thresh.realMin(i) + 1);
 		}
-		final ArrayImg<BitType, BitArray> arrayMask =
-			new ArrayImgFactory<BitType>().createBitInstance(dimensions, 1);
+		final ArrayImg<BitType, LongArray> arrayMask = ArrayImgs.bits(dimensions);
 		final BitType t = new BitType(arrayMask);
 		arrayMask.setLinkedType(t);
-		final Img<BitType> mask =
-			new ImgTranslationAdapter<BitType, ArrayImg<BitType, BitArray>>(
-				arrayMask, min);
+		final IntervalView<BitType> mask = Views.translate(arrayMask, min);
 		final RandomAccess<BitType> raMask = mask.randomAccess();
 		iter.reset();
 		while (iter.hasNext()) {
@@ -181,7 +179,7 @@ public class ConvertToMask extends ContextCommand {
 		}
 		output =
 			new BinaryMaskOverlay(context,
-				new BinaryMaskRegionOfInterest<BitType, Img<BitType>>(mask));
+				new BinaryMaskRegionOfInterest<BitType, IntervalView<BitType>>(mask));
 		output.setAlpha(alpha);
 		output.setFillColor(color);
 		for (int i = 0; i < numDims; i++) {
