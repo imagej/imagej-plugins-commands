@@ -36,22 +36,22 @@ import java.util.List;
 
 import net.imagej.Dataset;
 import net.imagej.DatasetService;
+import net.imagej.ImgPlus;
+import net.imagej.axis.Axes;
+import net.imagej.axis.AxisType;
 import net.imagej.display.ColorTables;
+import net.imagej.space.SpaceUtils;
 import net.imagej.types.BigComplex;
 import net.imagej.types.DataType;
 import net.imagej.types.DataTypeService;
 import net.imglib2.Cursor;
 import net.imglib2.RandomAccess;
-import net.imglib2.meta.Axes;
-import net.imglib2.meta.AxisType;
-import net.imglib2.meta.ImgPlus;
-import net.imglib2.meta.IntervalUtils;
-import net.imglib2.meta.SpaceUtils;
 import net.imglib2.ops.pointset.HyperVolumePointSet;
 import net.imglib2.ops.pointset.PointSet;
 import net.imglib2.ops.pointset.PointSetIterator;
 import net.imglib2.type.NativeType;
 import net.imglib2.type.numeric.RealType;
+import net.imglib2.util.Intervals;
 
 import org.scijava.command.Command;
 import org.scijava.command.DynamicCommand;
@@ -162,12 +162,12 @@ public class TypeChanger<U extends RealType<U>, V extends RealType<V> & NativeTy
 		}
 		BigComplex combined = new BigComplex();
 		BigComplex divisor = new BigComplex(count, 0);
-		long[] dims = calcDims(IntervalUtils.getDims(data), chAxis);
+		long[] dims = calcDims(Intervals.dimensionsAsLongArray(data), chAxis);
 		AxisType[] axes = calcAxes(SpaceUtils.getAxisTypes(data), chAxis);
 		Dataset newData =
 			datasetService.create(outType.createVariable(), dims, "Converted Image",
 				axes);
-		long[] span = IntervalUtils.getDims(data).clone();
+		long[] span = Intervals.dimensionsAsLongArray(data).clone();
 		span[chAxis] = 1;
 		PointSet combinedSpace = new HyperVolumePointSet(span);
 		PointSetIterator iter = combinedSpace.iterator();
@@ -202,8 +202,9 @@ public class TypeChanger<U extends RealType<U>, V extends RealType<V> & NativeTy
 		channelPreservingCase(DataType<U> inType, DataType<V> outType)
 	{
 		Dataset newData =
-			datasetService.create(outType.createVariable(), IntervalUtils
-				.getDims(data), "Converted Image", SpaceUtils.getAxisTypes(data));
+			datasetService.create(outType.createVariable(), Intervals
+				.dimensionsAsLongArray(data), "Converted Image", SpaceUtils
+				.getAxisTypes(data));
 		Cursor<U> inCursor = (Cursor<U>) data.getImgPlus().cursor();
 		RandomAccess<V> outAccessor =
 			(RandomAccess<V>) newData.getImgPlus().randomAccess();

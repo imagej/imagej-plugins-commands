@@ -33,6 +33,7 @@ package net.imagej.plugins.commands.assign;
 
 import net.imagej.Dataset;
 import net.imagej.Position;
+import net.imagej.axis.Axes;
 import net.imagej.display.DatasetView;
 import net.imagej.display.ImageDisplay;
 import net.imagej.display.ImageDisplayService;
@@ -41,7 +42,6 @@ import net.imagej.overlay.Overlay;
 import net.imglib2.RandomAccess;
 import net.imglib2.img.Img;
 import net.imglib2.img.array.ArrayImgFactory;
-import net.imglib2.meta.Axes;
 import net.imglib2.ops.operation.complex.unary.ComplexUnaryOperation;
 import net.imglib2.ops.pointset.HyperVolumePointSet;
 import net.imglib2.ops.pointset.PointSet;

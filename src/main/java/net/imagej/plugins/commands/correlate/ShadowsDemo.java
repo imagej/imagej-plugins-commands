@@ -32,11 +32,11 @@
 package net.imagej.plugins.commands.correlate;
 
 import net.imagej.Dataset;
+import net.imagej.axis.Axes;
+import net.imagej.axis.AxisType;
 import net.imagej.display.ImageDisplay;
 import net.imagej.display.ImageDisplayService;
 import net.imagej.display.OverlayService;
-import net.imglib2.meta.Axes;
-import net.imglib2.meta.AxisType;
 
 import org.scijava.app.StatusService;
 import org.scijava.command.Command;

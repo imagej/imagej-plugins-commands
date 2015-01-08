@@ -32,9 +32,9 @@
 package net.imagej.plugins.commands.imglib;
 
 import net.imagej.Dataset;
+import net.imagej.axis.CalibratedAxis;
 import net.imglib2.algorithm.gauss3.Gauss3;
 import net.imglib2.img.Img;
-import net.imglib2.meta.CalibratedAxis;
 import net.imglib2.type.numeric.RealType;
 import net.imglib2.view.ExtendedRandomAccessibleInterval;
 import net.imglib2.view.Views;

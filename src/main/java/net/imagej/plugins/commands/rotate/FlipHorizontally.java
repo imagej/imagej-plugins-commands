@@ -33,13 +33,13 @@ package net.imagej.plugins.commands.rotate;
 
 import net.imagej.Dataset;
 import net.imagej.Extents;
+import net.imagej.ImgPlus;
 import net.imagej.Position;
+import net.imagej.axis.Axes;
 import net.imagej.display.ImageDisplay;
 import net.imagej.display.ImageDisplayService;
 import net.imagej.display.OverlayService;
 import net.imglib2.RandomAccess;
-import net.imglib2.meta.Axes;
-import net.imglib2.meta.ImgPlus;
 import net.imglib2.type.numeric.RealType;
 
 import org.scijava.ItemIO;

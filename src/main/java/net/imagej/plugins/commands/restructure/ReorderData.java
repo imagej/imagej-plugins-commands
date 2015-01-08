@@ -35,15 +35,15 @@ import java.util.ArrayList;
 import java.util.Map;
 
 import net.imagej.Dataset;
+import net.imagej.ImgPlus;
+import net.imagej.axis.Axes;
+import net.imagej.axis.AxisType;
+import net.imagej.space.SpaceUtils;
 import net.imglib2.RandomAccess;
-import net.imglib2.meta.Axes;
-import net.imglib2.meta.AxisType;
-import net.imglib2.meta.ImgPlus;
-import net.imglib2.meta.IntervalUtils;
-import net.imglib2.meta.SpaceUtils;
 import net.imglib2.ops.pointset.HyperVolumePointSet;
 import net.imglib2.ops.pointset.PointSetIterator;
 import net.imglib2.type.numeric.RealType;
+import net.imglib2.util.Intervals;
 
 import org.scijava.ItemIO;
 import org.scijava.command.Command;
@@ -243,7 +243,7 @@ public class ReorderData extends DynamicCommand {
 		dataset.getImgPlus().dimensions(inputSpan);
 		final HyperVolumePointSet volume = new HyperVolumePointSet(inputSpan);
 		final PointSetIterator iter = volume.iterator();
-		final long[] origDims = IntervalUtils.getDims(dataset);
+		final long[] origDims = Intervals.dimensionsAsLongArray(dataset);
 		final AxisType[] origAxes = SpaceUtils.getAxisTypes(dataset);
 		final long[] newDims = getNewDims(origDims);
 		final AxisType[] newAxes = getNewAxes(origAxes);

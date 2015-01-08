@@ -33,6 +33,9 @@ package net.imagej.plugins.commands.misc;
 
 import net.imagej.Dataset;
 import net.imagej.Position;
+import net.imagej.axis.Axes;
+import net.imagej.axis.CalibratedAxis;
+import net.imagej.axis.LinearAxis;
 import net.imagej.display.ColorMode;
 import net.imagej.display.DatasetView;
 import net.imagej.display.ImageDisplay;
@@ -41,9 +44,6 @@ import net.imagej.overlay.ThresholdOverlay;
 import net.imagej.threshold.ThresholdService;
 import net.imagej.types.DataType;
 import net.imagej.types.DataTypeService;
-import net.imglib2.meta.Axes;
-import net.imglib2.meta.CalibratedAxis;
-import net.imglib2.meta.axis.LinearAxis;
 
 import org.scijava.ItemIO;
 import org.scijava.command.Command;

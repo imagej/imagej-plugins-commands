@@ -32,9 +32,9 @@
 package net.imagej.plugins.commands.display;
 
 import net.imagej.Dataset;
+import net.imagej.axis.Axes;
 import net.imagej.display.DatasetView;
 import net.imglib2.Cursor;
-import net.imglib2.meta.Axes;
 import net.imglib2.type.numeric.RealType;
 
 import org.scijava.ItemIO;

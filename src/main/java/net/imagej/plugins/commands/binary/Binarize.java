@@ -37,6 +37,9 @@ import net.imagej.Dataset;
 import net.imagej.DatasetService;
 import net.imagej.autoscale.AutoscaleService;
 import net.imagej.autoscale.DataRange;
+import net.imagej.axis.Axes;
+import net.imagej.axis.AxisType;
+import net.imagej.axis.CalibratedAxis;
 import net.imagej.display.ImageDisplayService;
 import net.imagej.threshold.ThresholdMethod;
 import net.imagej.threshold.ThresholdService;
@@ -47,10 +50,7 @@ import net.imglib2.histogram.Histogram1d;
 import net.imglib2.histogram.Real1dBinMapper;
 import net.imglib2.img.Img;
 import net.imglib2.img.cell.AbstractCellImg;
-import net.imglib2.meta.Axes;
-import net.imglib2.meta.AxisType;
-import net.imglib2.meta.CalibratedAxis;
-import net.imglib2.meta.IntervalUtils;
+import net.imglib2.util.Intervals;
 import net.imglib2.ops.pointset.HyperVolumePointSet;
 import net.imglib2.ops.pointset.PointSet;
 import net.imglib2.ops.pointset.PointSetIterator;
@@ -318,7 +318,7 @@ public class Binarize<T extends RealType<T>> extends ContextCommand {
 	@Override
 	@SuppressWarnings("unchecked")
 	public void run() {
-		long[] dims = IntervalUtils.getDims(inputData);
+		long[] dims = Intervals.dimensionsAsLongArray(inputData);
 		String err = checkInputMask(inputMask, dims);
 		if (err != null) {
 			cancel(err);

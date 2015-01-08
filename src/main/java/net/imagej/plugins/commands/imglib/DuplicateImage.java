@@ -34,12 +34,12 @@ package net.imagej.plugins.commands.imglib;
 import java.util.HashMap;
 import java.util.Map;
 
+import net.imagej.axis.AxisType;
 import net.imagej.display.ImageDisplay;
 import net.imagej.sampler.AxisSubrange;
 import net.imagej.sampler.SamplerService;
 import net.imagej.sampler.SamplingDefinition;
-import net.imglib2.meta.AxisType;
-import net.imglib2.meta.SpaceUtils;
+import net.imagej.space.SpaceUtils;
 
 import org.scijava.ItemIO;
 import org.scijava.command.Command;

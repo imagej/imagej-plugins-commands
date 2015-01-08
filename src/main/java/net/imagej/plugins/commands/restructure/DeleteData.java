@@ -1,5 +1,5 @@
 /*
- * #%L
+* #%L
  * ImageJ software for multidimensional image processing and analysis.
  * %%
  * Copyright (C) 2009 - 2014 Board of Regents of the University of
@@ -34,12 +34,12 @@ package net.imagej.plugins.commands.restructure;
 import java.util.ArrayList;
 
 import net.imagej.Dataset;
-import net.imglib2.meta.Axes;
-import net.imglib2.meta.AxisType;
-import net.imglib2.meta.ImgPlus;
-import net.imglib2.meta.IntervalUtils;
-import net.imglib2.meta.SpaceUtils;
+import net.imagej.ImgPlus;
+import net.imagej.axis.Axes;
+import net.imagej.axis.AxisType;
+import net.imagej.space.SpaceUtils;
 import net.imglib2.type.numeric.RealType;
+import net.imglib2.util.Intervals;
 
 import org.scijava.ItemIO;
 import org.scijava.command.Command;
@@ -148,8 +148,8 @@ public class DeleteData extends DynamicCommand {
 		else {
 			int d = dataset.dimensionIndex(axis);
 			final ColorTableRemapper remapper =
-				new ColorTableRemapper(new RemapAlgorithm(IntervalUtils
-					.getDims(dataset), d));
+				new ColorTableRemapper(new RemapAlgorithm(Intervals
+					.dimensionsAsLongArray(dataset), d));
 			remapper.remapColorTables(dataset.getImgPlus(), dstImgPlus);
 		}
 		// TODO - metadata, etc.?

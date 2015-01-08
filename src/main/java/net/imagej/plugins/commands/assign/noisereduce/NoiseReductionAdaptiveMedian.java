@@ -35,8 +35,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 import net.imagej.Dataset;
+import net.imagej.ImgPlus;
 import net.imglib2.RandomAccessibleInterval;
-import net.imglib2.meta.ImgPlus;
 import net.imglib2.ops.function.Function;
 import net.imglib2.ops.function.real.RealAdaptiveMedianFunction;
 import net.imglib2.ops.function.real.RealImageFunction;

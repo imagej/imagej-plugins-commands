@@ -33,10 +33,10 @@ package net.imagej.plugins.commands.assign;
 
 import net.imagej.Dataset;
 import net.imagej.Position;
+import net.imagej.axis.Axes;
 import net.imagej.display.ImageDisplay;
 import net.imagej.overlay.Overlay;
 import net.imglib2.img.Img;
-import net.imglib2.meta.Axes;
 import net.imglib2.ops.condition.Condition;
 import net.imglib2.ops.condition.UVInsideRoiCondition;
 import net.imglib2.ops.function.complex.ComplexImageFunction;

@@ -36,11 +36,11 @@ import java.util.List;
 
 import net.imagej.Dataset;
 import net.imagej.DatasetService;
+import net.imagej.axis.AxisType;
 import net.imglib2.Cursor;
 import net.imglib2.RandomAccessibleInterval;
 import net.imglib2.img.Img;
 import net.imglib2.img.cell.AbstractCellImg;
-import net.imglib2.meta.AxisType;
 import net.imglib2.ops.function.Function;
 import net.imglib2.ops.function.real.RealArithmeticMeanFunction;
 import net.imglib2.ops.function.real.RealImageFunction;

@@ -36,12 +36,12 @@ import java.util.List;
 
 import net.imagej.Dataset;
 import net.imagej.DatasetService;
+import net.imagej.ImgPlus;
+import net.imagej.axis.Axes;
+import net.imagej.axis.AxisType;
+import net.imagej.axis.CalibratedAxis;
 import net.imglib2.img.Img;
 import net.imglib2.img.cell.AbstractCellImg;
-import net.imglib2.meta.Axes;
-import net.imglib2.meta.AxisType;
-import net.imglib2.meta.CalibratedAxis;
-import net.imglib2.meta.ImgPlus;
 import net.imglib2.ops.operation.iterableinterval.unary.Resample;
 import net.imglib2.type.numeric.RealType;
 

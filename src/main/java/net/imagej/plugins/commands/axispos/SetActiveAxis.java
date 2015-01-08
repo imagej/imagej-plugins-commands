@@ -35,9 +35,9 @@ import java.util.ArrayList;
 
 import net.imagej.animation.Animation;
 import net.imagej.animation.AnimationService;
+import net.imagej.axis.Axes;
+import net.imagej.axis.AxisType;
 import net.imagej.display.ImageDisplay;
-import net.imglib2.meta.Axes;
-import net.imglib2.meta.AxisType;
 
 import org.scijava.ItemIO;
 import org.scijava.command.Command;

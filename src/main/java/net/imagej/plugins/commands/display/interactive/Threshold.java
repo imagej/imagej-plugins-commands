@@ -32,8 +32,10 @@
 package net.imagej.plugins.commands.display.interactive;
 
 import net.imagej.Dataset;
+import net.imagej.ImgPlus;
 import net.imagej.autoscale.AutoscaleService;
 import net.imagej.autoscale.DataRange;
+import net.imagej.axis.AxisType;
 import net.imagej.command.InteractiveImageCommand;
 import net.imagej.display.ImageDisplay;
 import net.imagej.display.ImageDisplayService;
@@ -47,8 +49,6 @@ import net.imglib2.IterableInterval;
 import net.imglib2.histogram.Histogram1d;
 import net.imglib2.histogram.Real1dBinMapper;
 import net.imglib2.img.Img;
-import net.imglib2.meta.AxisType;
-import net.imglib2.meta.ImgPlus;
 import net.imglib2.type.numeric.RealType;
 import net.imglib2.view.IntervalView;
 import net.imglib2.view.Views;

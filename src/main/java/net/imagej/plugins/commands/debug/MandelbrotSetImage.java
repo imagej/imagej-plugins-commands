@@ -37,6 +37,11 @@ import java.util.Map;
 
 import net.imagej.Dataset;
 import net.imagej.DatasetService;
+import net.imagej.ImgPlus;
+import net.imagej.axis.Axes;
+import net.imagej.axis.AxisType;
+import net.imagej.axis.CalibratedAxis;
+import net.imagej.axis.DefaultLinearAxis;
 import net.imagej.display.ColorTables;
 import net.imagej.display.ImageDisplay;
 import net.imagej.display.ImageDisplayService;
@@ -45,11 +50,6 @@ import net.imagej.lut.LUTService;
 import net.imagej.overlay.Overlay;
 import net.imglib2.RandomAccess;
 import net.imglib2.display.ColorTable;
-import net.imglib2.meta.Axes;
-import net.imglib2.meta.AxisType;
-import net.imglib2.meta.CalibratedAxis;
-import net.imglib2.meta.ImgPlus;
-import net.imglib2.meta.axis.DefaultLinearAxis;
 import net.imglib2.type.numeric.RealType;
 
 import org.scijava.ItemIO;

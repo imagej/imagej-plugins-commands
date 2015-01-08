@@ -34,10 +34,10 @@ package net.imagej.plugins.commands.restructure;
 import java.util.ArrayList;
 
 import net.imagej.Dataset;
-import net.imglib2.meta.Axes;
-import net.imglib2.meta.AxisType;
-import net.imglib2.meta.ImgPlus;
-import net.imglib2.meta.SpaceUtils;
+import net.imagej.ImgPlus;
+import net.imagej.axis.Axes;
+import net.imagej.axis.AxisType;
+import net.imagej.space.SpaceUtils;
 import net.imglib2.type.numeric.RealType;
 
 import org.scijava.ItemIO;

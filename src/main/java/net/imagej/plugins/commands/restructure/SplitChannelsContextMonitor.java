@@ -32,9 +32,9 @@
 package net.imagej.plugins.commands.restructure;
 
 import net.imagej.Dataset;
+import net.imagej.axis.Axes;
 import net.imagej.display.ImageDisplayService;
 import net.imagej.event.DataRestructuredEvent;
-import net.imglib2.meta.Axes;
 
 import org.scijava.command.CommandInfo;
 import org.scijava.command.CommandService;

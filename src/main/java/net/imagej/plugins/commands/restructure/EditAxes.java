@@ -36,10 +36,10 @@ import java.util.Collections;
 import java.util.List;
 
 import net.imagej.Dataset;
-import net.imglib2.meta.Axes;
-import net.imglib2.meta.AxisType;
-import net.imglib2.meta.CalibratedAxis;
-import net.imglib2.meta.axis.VariableAxis;
+import net.imagej.axis.Axes;
+import net.imagej.axis.AxisType;
+import net.imagej.axis.CalibratedAxis;
+import net.imagej.axis.VariableAxis;
 
 import org.scijava.ItemIO;
 import org.scijava.ItemVisibility;

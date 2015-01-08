@@ -32,6 +32,7 @@
 package net.imagej.plugins.commands.display;
 
 import net.imagej.Dataset;
+import net.imagej.axis.Axes;
 import net.imagej.display.ImageDisplay;
 import net.imagej.display.ImageDisplayService;
 import net.imagej.display.OverlayService;
@@ -43,8 +44,7 @@ import net.imglib2.RandomAccess;
 import net.imglib2.histogram.DiscreteFrequencyDistribution;
 import net.imglib2.histogram.Histogram1d;
 import net.imglib2.histogram.Real1dBinMapper;
-import net.imglib2.meta.Axes;
-import net.imglib2.meta.IntervalUtils;
+import net.imglib2.util.Intervals;
 import net.imglib2.ops.pointset.HyperVolumePointSet;
 import net.imglib2.ops.pointset.PointSetIterator;
 import net.imglib2.type.numeric.RealType;
@@ -411,7 +411,7 @@ public class HistogramPlot<T extends RealType<T>> extends InteractiveCommand
 		int composH = histograms.length - 1;
 		RandomAccess<? extends RealType<?>> accessor =
 			dataset.getImgPlus().randomAccess();
-		long[] span = IntervalUtils.getDims(dataset);
+		long[] span = Intervals.dimensionsAsLongArray(dataset);
 		if (chIndex >= 0) span[chIndex] = 1; // iterate channels elsewhere
 		HyperVolumePointSet pixelSpace = new HyperVolumePointSet(span);
 		PointSetIterator pixelSpaceIter = pixelSpace.iterator();

@@ -35,7 +35,7 @@ import java.io.File;
 import java.util.HashMap;
 
 import net.imagej.Dataset;
-import net.imglib2.meta.ImgPlus;
+import net.imagej.ImgPlus;
 
 import org.scijava.command.Command;
 import org.scijava.command.CommandService;
