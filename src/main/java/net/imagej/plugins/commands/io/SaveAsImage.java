@@ -49,7 +49,6 @@ import org.scijava.plugin.Menu;
 import org.scijava.plugin.Parameter;
 import org.scijava.plugin.Plugin;
 import org.scijava.ui.DialogPrompt;
-import org.scijava.ui.DialogPrompt.Result;
 import org.scijava.ui.UIService;
 import org.scijava.widget.FileWidget;
 
@@ -90,14 +89,6 @@ public class SaveAsImage extends ContextCommand {
 
 	@Override
 	public void run() {
-		if (outputFile.exists()) {
-			final Result result =
-				uiService.showDialog("\"" + outputFile.getName() +
-					"\" already exists. Do you want to replace it?", "Save",
-					DialogPrompt.MessageType.WARNING_MESSAGE,
-					DialogPrompt.OptionType.YES_NO_OPTION);
-			if (result != DialogPrompt.Result.YES_OPTION) return; // abort
-		}
 		try {
 			datasetIOService.save(dataset, outputFile.getAbsolutePath());
 		}
