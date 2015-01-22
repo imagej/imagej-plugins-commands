@@ -33,6 +33,7 @@ package net.imagej.plugins.commands.io;
 import io.scif.config.SCIFIOConfig;
 import io.scif.img.ImageRegion;
 import io.scif.img.Range;
+import io.scif.services.DatasetIOService;
 
 import java.io.File;
 import java.io.IOException;
@@ -40,7 +41,6 @@ import java.util.HashMap;
 import java.util.Map;
 
 import net.imagej.Dataset;
-import net.imagej.DatasetService;
 import net.imagej.axis.Axes;
 import net.imagej.axis.AxisType;
 
@@ -69,7 +69,7 @@ public class OpenDataset extends ContextCommand {
 	private static final int MAX_HEADER = 55;
 
 	@Parameter
-	private DatasetService datasetService;
+	private DatasetIOService datasetIOService;
 
 	@Parameter
 	private LogService logService;
@@ -143,7 +143,7 @@ public class OpenDataset extends ContextCommand {
 
 		// Open the dataset
 		try {
-			dataset = datasetService.open(source.getAbsolutePath(), config);
+			dataset = datasetIOService.open(source.getAbsolutePath(), config);
 		}
 		catch (IOException e) {
 			logService.error(e);

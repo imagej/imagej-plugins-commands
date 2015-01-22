@@ -31,10 +31,11 @@
 
 package net.imagej.plugins.commands.io;
 
+import io.scif.services.DatasetIOService;
+
 import java.io.IOException;
 
 import net.imagej.Dataset;
-import net.imagej.DatasetService;
 
 import org.scijava.ItemIO;
 import org.scijava.command.Command;
@@ -64,7 +65,7 @@ public class RevertImage extends ContextCommand {
 	private LogService log;
 
 	@Parameter
-	private DatasetService datasetService;
+	private DatasetIOService datasetIOService;
 
 	@Parameter
 	private UIService uiService;
@@ -75,7 +76,7 @@ public class RevertImage extends ContextCommand {
 	@Override
 	public void run() {
 		try {
-			datasetService.revert(dataset);
+			datasetIOService.revert(dataset);
 		}
 		catch (final IOException exc) {
 			log.error(exc);

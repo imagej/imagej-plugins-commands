@@ -31,11 +31,12 @@
 
 package net.imagej.plugins.commands.io;
 
+import io.scif.services.DatasetIOService;
+
 import java.io.File;
 import java.io.IOException;
 
 import net.imagej.Dataset;
-import net.imagej.DatasetService;
 
 import org.scijava.ItemIO;
 import org.scijava.command.Command;
@@ -67,7 +68,7 @@ public class SaveAsImage extends ContextCommand {
 	private LogService log;
 
 	@Parameter
-	private DatasetService datasetService;
+	private DatasetIOService datasetIOService;
 
 	@Parameter
 	private UIService uiService;
@@ -98,7 +99,7 @@ public class SaveAsImage extends ContextCommand {
 			if (result != DialogPrompt.Result.YES_OPTION) return; // abort
 		}
 		try {
-			datasetService.save(dataset, outputFile.getAbsolutePath());
+			datasetIOService.save(dataset, outputFile.getAbsolutePath());
 		}
 		catch (final IOException exc) {
 			log.error(exc);

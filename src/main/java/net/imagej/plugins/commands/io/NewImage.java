@@ -31,6 +31,8 @@
 
 package net.imagej.plugins.commands.io;
 
+import io.scif.services.DatasetIOService;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -91,6 +93,9 @@ public class NewImage<U extends RealType<U> & NativeType<U>> extends
 	private static final String DEFAULT_NAME = "Untitled";
 	
 	// -- Parameters --
+
+	@Parameter
+	private DatasetIOService datasetIOService;
 
 	@Parameter
 	private DatasetService datasetService;
