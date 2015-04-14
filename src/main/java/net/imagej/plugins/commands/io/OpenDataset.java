@@ -87,6 +87,9 @@ public class OpenDataset extends ContextCommand {
 	@Parameter(required = false)
 	private Boolean crop;
 
+	@Parameter(required = false)
+	private Boolean computeMinMax;
+
 	//TODO callback to enable/disable these fields based on crop value
 	@Parameter(required = false, min = "0")
 	private Integer x = 0;
@@ -134,6 +137,11 @@ public class OpenDataset extends ContextCommand {
 				logService.warn("ignoring bad crop region: " + x + ", " + y + ", " + w +
 					", " + h);
 			}
+		}
+
+		// Set compute min/max if desired
+		if (computeMinMax != null) {
+			config.imgOpenerSetComputeMinMax(computeMinMax);
 		}
 
 		// Set the groupFiles flag if desired
