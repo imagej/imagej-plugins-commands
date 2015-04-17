@@ -90,7 +90,7 @@ public class OpenDataset extends ContextCommand {
 	@Parameter(label = "Autoscale", required = false)
 	private Boolean autoscale;
 
-	@Parameter(required = false)
+	@Parameter(label = "Compute min/max values", required = false)
 	private Boolean computeMinMax;
 
 	//TODO callback to enable/disable these fields based on crop value
