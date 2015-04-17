@@ -87,6 +87,9 @@ public class OpenDataset extends ContextCommand {
 	@Parameter(required = false)
 	private Boolean crop;
 
+	@Parameter(label = "Autoscale", required = false)
+	private Boolean autoscale;
+
 	@Parameter(required = false)
 	private Boolean computeMinMax;
 
@@ -156,6 +159,15 @@ public class OpenDataset extends ContextCommand {
 		catch (IOException e) {
 			logService.error(e);
 			error(e.getMessage());
+		}
+
+		// If autoscaling is requested, clear out any channel min/max on the Dataset
+		// so that a DatasetView will know to autoscale.
+		if (autoscale != null && autoscale) {
+			for (int c=0; c<dataset.getCompositeChannelCount(); c++) {
+				dataset.setChannelMinimum(c, Double.NaN);
+				dataset.setChannelMaximum(c, Double.NaN);
+			}
 		}
 	}
 
