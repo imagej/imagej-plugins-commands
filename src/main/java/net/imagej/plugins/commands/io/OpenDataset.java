@@ -45,7 +45,6 @@ import net.imagej.axis.Axes;
 import net.imagej.axis.AxisType;
 
 import org.scijava.ItemIO;
-import org.scijava.ItemVisibility;
 import org.scijava.command.Command;
 import org.scijava.command.ContextCommand;
 import org.scijava.log.LogService;
@@ -66,8 +65,6 @@ import org.scijava.ui.UIService;
 	@Menu(label = "Import"), @Menu(label = "Image... ") })
 public class OpenDataset extends ContextCommand {
 
-	private static final int MAX_HEADER = 55;
-
 	@Parameter
 	private DatasetIOService datasetIOService;
 
@@ -76,10 +73,6 @@ public class OpenDataset extends ContextCommand {
 
 	@Parameter
 	private UIService uiService;
-
-	@Parameter(visibility = ItemVisibility.MESSAGE, persist = false,
-		required = false, initializer = "setHeader")
-	private String header;
 
 	@Parameter(label = "File to open")
 	private File source;
@@ -179,21 +172,6 @@ public class OpenDataset extends ContextCommand {
 	{
 		return (x != null && y != null && w != null && h != null) &&
 			(x >= 0 && y >= 0 && w >= 0 && h >= 0);
-	}
-
-	// Callback method
-	@SuppressWarnings("unused")
-	private void setHeader() {
-		if (source != null) {
-			final String id = source.getAbsolutePath();
-			// Truncate long headers if needed
-			if (source.length() > MAX_HEADER) {
-				header = "..." + id.substring(id.length() - (MAX_HEADER - 3));
-			}
-			else {
-				header = id;
-			}
-		}
 	}
 
 	// -- Helper methods --
