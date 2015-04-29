@@ -123,7 +123,7 @@ public class OpenDataset extends ContextCommand {
 
 		// Crop if desired
 		if (crop != null && crop) {
-			if (validRange(x, y, w, h)) {
+			if (validRange()) {
 				Map<AxisType, Range> region = new HashMap<AxisType, Range>();
 				region.put(Axes.X, new Range(new Long(x), new Long(w)));
 				region.put(Axes.Y, new Range(new Long(y), new Long(h)));
@@ -167,9 +167,7 @@ public class OpenDataset extends ContextCommand {
 	/**
 	 * @return true if all params are non-null and positive.
 	 */
-	private boolean validRange(final Integer x, final Integer y, final Integer w,
-		final Integer h)
-	{
+	private boolean validRange() {
 		return (x != null && y != null && w != null && h != null) &&
 			(x >= 0 && y >= 0 && w >= 0 && h >= 0);
 	}
