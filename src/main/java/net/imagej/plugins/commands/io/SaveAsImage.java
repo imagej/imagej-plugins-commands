@@ -82,11 +82,6 @@ public class SaveAsImage extends ContextCommand {
 	@Parameter(type = ItemIO.BOTH)
 	private Display<?> display;
 
-	protected void initOutputFile() {
-		if (dataset == null) return;
-		outputFile = new File(dataset.getImgPlus().getSource());
-	}
-
 	@Override
 	public void run() {
 		try {
@@ -100,6 +95,13 @@ public class SaveAsImage extends ContextCommand {
 		}
 
 		display.setName(dataset.getName());
+	}
+
+	// -- Initializer methods --
+
+	protected void initOutputFile() {
+		if (dataset == null) return;
+		outputFile = new File(dataset.getImgPlus().getSource());
 	}
 
 }
