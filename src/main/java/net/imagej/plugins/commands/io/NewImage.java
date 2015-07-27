@@ -148,10 +148,10 @@ public class NewImage<U extends RealType<U> & NativeType<U>> extends
 	}
 
 	public void setFillType(final String fillType) {
-		if (MIN.toString().equalsIgnoreCase(fillType)) this.fillType = MIN;
-		else if (MAX.toString().equalsIgnoreCase(fillType)) this.fillType = MAX;
-		else if (RAMP.toString().equalsIgnoreCase(fillType)) this.fillType = RAMP;
-		else if (ZERO.toString().equalsIgnoreCase(fillType)) this.fillType = ZERO;
+		if (MIN.equalsIgnoreCase(fillType)) this.fillType = MIN;
+		else if (MAX.equalsIgnoreCase(fillType)) this.fillType = MAX;
+		else if (RAMP.equalsIgnoreCase(fillType)) this.fillType = RAMP;
+		else if (ZERO.equalsIgnoreCase(fillType)) this.fillType = ZERO;
 		else {
 			throw new IllegalArgumentException("please specify fill type as one of " +
 				MIN + ", " + MAX + ", " + RAMP + ", or " + ZERO);
