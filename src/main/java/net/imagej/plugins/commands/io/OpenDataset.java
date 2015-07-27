@@ -31,6 +31,7 @@
 package net.imagej.plugins.commands.io;
 
 import io.scif.config.SCIFIOConfig;
+import io.scif.config.SCIFIOConfig.ImgMode;
 import io.scif.img.ImageRegion;
 import io.scif.img.Range;
 import io.scif.services.DatasetIOService;
@@ -105,6 +106,10 @@ public class OpenDataset extends ContextCommand {
 	@Parameter(required = false, label = "Group similar files")
 	private Boolean groupFiles;
 
+	@Parameter(required = false, label = "Image mode", choices = { "Auto",
+		"Planar", "Cell" })
+	private String mode = "Auto";
+
 	@Parameter(type = ItemIO.OUTPUT)
 	private Dataset dataset;
 
@@ -144,6 +149,10 @@ public class OpenDataset extends ContextCommand {
 		if (groupFiles != null) {
 			config.groupableSetGroupFiles(groupFiles);
 		}
+
+		// Set the desired image modes
+		if (mode.equals("Planar")) config.imgOpenerSetImgModes(ImgMode.PLANAR);
+		else if (mode.equals("Cell")) config.imgOpenerSetImgModes(ImgMode.CELL);
 
 		// Open the dataset
 		try {
