@@ -82,6 +82,8 @@ public class SaveAsImage extends ContextCommand {
 	@Parameter(type = ItemIO.BOTH)
 	private Display<?> display;
 
+	// -- Runnable methods --
+
 	@Override
 	public void run() {
 		try {
