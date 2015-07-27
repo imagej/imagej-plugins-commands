@@ -37,11 +37,12 @@ import java.io.File;
 import java.io.IOException;
 
 import net.imagej.Dataset;
+import net.imagej.display.ImageDisplay;
+import net.imagej.display.ImageDisplayService;
 
 import org.scijava.ItemIO;
 import org.scijava.command.Command;
 import org.scijava.command.ContextCommand;
-import org.scijava.display.Display;
 import org.scijava.log.LogService;
 import org.scijava.menu.MenuConstants;
 import org.scijava.plugin.Attr;
@@ -70,22 +71,23 @@ public class SaveAsImage extends ContextCommand {
 	private DatasetIOService datasetIOService;
 
 	@Parameter
+	private ImageDisplayService imageDisplayService;
+
+	@Parameter
 	private UIService uiService;
 
 	@Parameter(label = "File to save", style = FileWidget.SAVE_STYLE,
 		initializer = "initOutputFile", persist = false)
 	private File outputFile;
 
-	@Parameter
-	private Dataset dataset;
-
 	@Parameter(type = ItemIO.BOTH)
-	private Display<?> display;
+	private ImageDisplay display;
 
 	// -- Runnable methods --
 
 	@Override
 	public void run() {
+		final Dataset dataset = dataset();
 		try {
 			datasetIOService.save(dataset, outputFile.getAbsolutePath());
 		}
@@ -102,8 +104,15 @@ public class SaveAsImage extends ContextCommand {
 	// -- Initializer methods --
 
 	protected void initOutputFile() {
+		final Dataset dataset = dataset();
 		if (dataset == null) return;
 		outputFile = new File(dataset.getSource());
+	}
+
+	// -- Helper methods --
+
+	private Dataset dataset() {
+		return imageDisplayService.getActiveDataset(display);
 	}
 
 }
