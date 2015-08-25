@@ -10,7 +10,7 @@
 	</parent>
 
 	<artifactId>imagej-plugins-commands</artifactId>
-	<version>0.5.2-SNAPSHOT</version>
+	<version>0.5.3-SNAPSHOT</version>
 
 	<name>ImageJ Plugins: Commands</name>
 	<description>Core commands for ImageJ.</description>
