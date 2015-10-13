@@ -31,23 +31,17 @@
 
 package net.imagej.plugins.commands.assign;
 
-import net.imagej.Dataset;
-import net.imagej.Position;
-import net.imagej.display.DatasetView;
-import net.imagej.display.ImageDisplay;
-import net.imagej.display.ImageDisplayService;
-import net.imagej.display.OverlayService;
-import net.imagej.overlay.Overlay;
-import net.imglib2.type.numeric.RealType;
-
-import org.scijava.ItemIO;
 import org.scijava.command.Command;
-import org.scijava.command.ContextCommand;
 import org.scijava.menu.MenuConstants;
 import org.scijava.plugin.Attr;
 import org.scijava.plugin.Menu;
 import org.scijava.plugin.Parameter;
 import org.scijava.plugin.Plugin;
+
+import net.imagej.Dataset;
+import net.imagej.ops.filter.addNoise.AddNoiseRealType;
+import net.imglib2.type.numeric.RealType;
+import net.imglib2.type.numeric.real.DoubleType;
 
 /**
  * Fills an output Dataset by applying a user calibrated amount of random noise
@@ -62,54 +56,31 @@ import org.scijava.plugin.Plugin;
 	@Menu(label = "Noise", mnemonic = 'n'),
 	@Menu(label = "Add Specified Noise...", weight = 2) }, headless = true, attrs = { @Attr(name = "no-legacy") })
 public class AddSpecifiedNoiseToDataValues<T extends RealType<T>>
-	extends ContextCommand
+	extends MathCommand<T, DoubleType>
 {
+	
+	public AddSpecifiedNoiseToDataValues() {
+		super(new DoubleType());
+	}
 
 	// -- instance variables that are Parameters --
 
-	@Parameter
-	private ImageDisplayService displayService;
-
-	@Parameter
-	private OverlayService overlayService;
-
-	@Parameter(type = ItemIO.BOTH)
-	private ImageDisplay display;
-
-	@Parameter(label = "Standard deviation")
-	private double stdDev;
-
-	@Parameter(label = "Apply to all planes")
-	private boolean allPlanes;
+	@Parameter(label = "Standard deviation", required = false)
+	private double stdDev = 25.0;
+	
+	@Parameter(label = "Seed", required = false)
+	private long seed = 0xabcdef1234567890L; 
 
 	// -- public interface --
 
 	@Override
-	public void run() {
-		Dataset dataset = displayService.getActiveDataset(display);
-		Overlay overlay = overlayService.getActiveOverlay(display);
-		DatasetView view = displayService.getActiveDatasetView(display);
-		Position planePos = (allPlanes) ? null : view.getPlanePosition();
-		NoiseAdder<T> noiseAdder =
-			new NoiseAdder<T>(dataset, overlay, planePos);
-		noiseAdder.setStdDev(stdDev);
-		noiseAdder.run();
-	}
-
-	public ImageDisplay getDisplay() {
-		return display;
-	}
-
-	public void setDisplay(final ImageDisplay display) {
-		this.display = display;
-	}
-
-	public boolean isAllPlanes() {
-		return allPlanes;
-	}
-	
-	public void setAllPlanes(boolean value) {
-		this.allPlanes = value;
+	public AddNoiseRealType<DoubleType, DoubleType> getOperation() {
+		final Dataset dataset = getDataset();
+		final double rangeMin = dataset.getType().getMinValue();
+		final double rangeMax = dataset.getType().getMaxValue();
+		return (AddNoiseRealType<DoubleType, DoubleType>) opService.computer(
+			AddNoiseRealType.class, DoubleType.class, DoubleType.class, rangeMin,
+			rangeMax, stdDev, seed);
 	}
 	
 	public double getStdDev() {

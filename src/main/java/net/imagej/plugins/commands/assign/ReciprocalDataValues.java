@@ -31,26 +31,18 @@
 
 package net.imagej.plugins.commands.assign;
 
-import net.imagej.Dataset;
-import net.imagej.display.DatasetView;
-import net.imagej.display.ImageDisplay;
-import net.imagej.display.ImageDisplayService;
-import net.imagej.display.OverlayService;
-import net.imagej.options.OptionsMisc;
-import net.imagej.overlay.Overlay;
-import net.imglib2.ops.operation.real.unary.RealReciprocal;
-import net.imglib2.type.numeric.RealType;
-import net.imglib2.type.numeric.real.DoubleType;
-
-import org.scijava.ItemIO;
 import org.scijava.command.Command;
-import org.scijava.command.ContextCommand;
 import org.scijava.menu.MenuConstants;
 import org.scijava.options.OptionsService;
 import org.scijava.plugin.Attr;
 import org.scijava.plugin.Menu;
 import org.scijava.plugin.Parameter;
 import org.scijava.plugin.Plugin;
+
+import net.imagej.ops.math.RealMath.Reciprocal;
+import net.imagej.options.OptionsMisc;
+import net.imglib2.type.numeric.RealType;
+import net.imglib2.type.numeric.real.DoubleType;
 
 /**
  * Fills an output Dataset by taking reciprocal values of an input Dataset.
@@ -65,33 +57,21 @@ import org.scijava.plugin.Plugin;
 	@Menu(label = "Math", mnemonic = 'm'),
 	@Menu(label = "Reciprocal...", weight = 17) }, headless = true, attrs = { @Attr(name = "no-legacy") })
 public class ReciprocalDataValues<T extends RealType<T>>
-	extends ContextCommand
+	extends MathCommand<T, DoubleType>
 {
 	// -- instance variables that are Parameters --
 
 	@Parameter
 	private OptionsService optionsService;
 
-	@Parameter
-	private OverlayService overlayService;
-
-	@Parameter
-	private ImageDisplayService imgDispService;
-
-	@Parameter(type = ItemIO.BOTH)
-	private ImageDisplay display;
-	
-	@Parameter(label = "Apply to all planes")
-	private boolean allPlanes;
-
 	// -- public interface --
+	
+	public ReciprocalDataValues() {
+		super(new DoubleType());
+	}
 
 	@Override
-	public void run() {
-		Dataset dataset = imgDispService.getActiveDataset(display);
-		Overlay overlay = overlayService.getActiveOverlay(display);
-		DatasetView view = imgDispService.getActiveDatasetView(display);
-		
+	public Reciprocal<DoubleType, DoubleType> getOperation() {		
 		final OptionsMisc optionsMisc =
 				optionsService.getOptions(OptionsMisc.class);
 		final String dbzString = optionsMisc.getDivByZeroVal();
@@ -102,38 +82,8 @@ public class ReciprocalDataValues<T extends RealType<T>>
 		catch (final NumberFormatException e) {
 			dbzVal = Double.POSITIVE_INFINITY;
 		}
-		final RealReciprocal<DoubleType, DoubleType> op =
-			new RealReciprocal<DoubleType, DoubleType>(dbzVal);
-		
-		final InplaceUnaryTransform<T, DoubleType> transform;
-		
-		if (allPlanes)
-			transform = 
-				new InplaceUnaryTransform<T, DoubleType>(
-					op, new DoubleType(), dataset, overlay);
-		else
-			transform = 
-				new InplaceUnaryTransform<T, DoubleType>(
-					op, new DoubleType(), dataset, overlay,
-					view.getPlanePosition());
-		
-		transform.run();
-	}
-
-	public ImageDisplay getDisplay() {
-		return display;
-	}
-
-	public void setDisplay(ImageDisplay display) {
-		this.display = display;
-	}
-
-	public boolean isAllPlanes() {
-		return allPlanes;
-	}
-	
-	public void setAllPlanes(boolean value) {
-		this.allPlanes = value;
+		return (Reciprocal<DoubleType, DoubleType>) opService.computer(
+			Reciprocal.class, DoubleType.class, DoubleType.class, dbzVal);
 	}
 
 }

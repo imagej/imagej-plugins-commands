@@ -31,16 +31,16 @@
 
 package net.imagej.plugins.commands.assign;
 
-import net.imglib2.ops.operation.real.unary.RealOrConstant;
-import net.imglib2.type.numeric.RealType;
-import net.imglib2.type.numeric.real.DoubleType;
-
 import org.scijava.command.Command;
 import org.scijava.menu.MenuConstants;
 import org.scijava.plugin.Attr;
 import org.scijava.plugin.Menu;
 import org.scijava.plugin.Parameter;
 import org.scijava.plugin.Plugin;
+
+import net.imagej.ops.math.RealMath.OrConstant;
+import net.imglib2.type.numeric.RealType;
+import net.imglib2.type.numeric.real.DoubleType;
 
 /**
  * Fills an output Dataset by ORing an input Dataset with a user defined
@@ -70,8 +70,9 @@ public class OrDataValuesWith<T extends RealType<T>>
 	}
 
 	@Override
-	public RealOrConstant<DoubleType, DoubleType> getOperation() {
-		return new RealOrConstant<DoubleType, DoubleType>(value);
+	public OrConstant<DoubleType, DoubleType> getOperation() {
+		return (OrConstant<DoubleType, DoubleType>) opService.computer(
+			OrConstant.class, DoubleType.class, DoubleType.class, value);
 	}
 
 	public long getValue() {

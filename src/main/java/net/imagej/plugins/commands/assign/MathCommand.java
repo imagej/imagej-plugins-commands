@@ -31,6 +31,11 @@
 
 package net.imagej.plugins.commands.assign;
 
+import org.scijava.ItemIO;
+import org.scijava.command.ContextCommand;
+import org.scijava.command.Previewable;
+import org.scijava.plugin.Parameter;
+
 import net.imagej.Dataset;
 import net.imagej.Position;
 import net.imagej.axis.Axes;
@@ -38,22 +43,18 @@ import net.imagej.display.DatasetView;
 import net.imagej.display.ImageDisplay;
 import net.imagej.display.ImageDisplayService;
 import net.imagej.display.OverlayService;
+import net.imagej.ops.ComputerOp;
+import net.imagej.ops.OpService;
 import net.imagej.overlay.Overlay;
 import net.imglib2.RandomAccess;
 import net.imglib2.img.Img;
 import net.imglib2.img.array.ArrayImgFactory;
-import net.imglib2.ops.operation.complex.unary.ComplexUnaryOperation;
 import net.imglib2.ops.pointset.HyperVolumePointSet;
 import net.imglib2.ops.pointset.PointSet;
 import net.imglib2.ops.pointset.PointSetIterator;
 import net.imglib2.type.numeric.ComplexType;
 import net.imglib2.type.numeric.RealType;
 import net.imglib2.type.numeric.real.DoubleType;
-
-import org.scijava.ItemIO;
-import org.scijava.command.ContextCommand;
-import org.scijava.command.Previewable;
-import org.scijava.plugin.Parameter;
 
 /**
  * Base class for previewable math commands.
@@ -70,6 +71,9 @@ public abstract class MathCommand<I extends ComplexType<I>, O extends ComplexTyp
 
 	@Parameter
 	protected OverlayService overlayService;
+	
+	@Parameter
+	protected OpService opService;
 
 	@Parameter(type = ItemIO.BOTH)
 	protected ImageDisplay display;
@@ -138,8 +142,12 @@ public abstract class MathCommand<I extends ComplexType<I>, O extends ComplexTyp
 	public void setPreview(final boolean preview) {
 		this.preview = preview;
 	}
+	
+	public Dataset getDataset() {
+		return dataset;
+	}
 
-	public abstract ComplexUnaryOperation<O,O> getOperation();
+	public abstract ComputerOp<O,O> getOperation();
 
 	// -- private helpers --
 

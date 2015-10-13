@@ -31,16 +31,23 @@
 
 package net.imagej.plugins.commands.assign;
 
+import org.scijava.plugin.Parameter;
+
 import net.imagej.Dataset;
 import net.imagej.Position;
 import net.imagej.axis.Axes;
 import net.imagej.display.ImageDisplay;
+import net.imagej.ops.ComputerOp;
+import net.imagej.ops.OpService;
+import net.imagej.ops.Ops;
+import net.imagej.ops.join.DefaultJoinComputerAndComputer;
 import net.imagej.overlay.Overlay;
+import net.imglib2.RandomAccessibleInterval;
+import net.imglib2.converter.ComplexRealFloatConverter;
+import net.imglib2.converter.Converters;
 import net.imglib2.img.Img;
 import net.imglib2.ops.condition.Condition;
 import net.imglib2.ops.condition.UVInsideRoiCondition;
-import net.imglib2.ops.function.complex.ComplexImageFunction;
-import net.imglib2.ops.function.general.GeneralUnaryFunction;
 import net.imglib2.ops.img.ImageAssignment;
 import net.imglib2.ops.input.InputIteratorFactory;
 import net.imglib2.ops.input.PointInputIteratorFactory;
@@ -48,11 +55,11 @@ import net.imglib2.ops.operation.complex.unary.ComplexUnaryOperation;
 import net.imglib2.type.numeric.ComplexType;
 
 /**
- * Helper class for use by many plugins that apply a {@link
- * ComplexUnaryOperation} to some input image. The run() method modifies the
- * current selection of the active {@link Dataset} of the given {@link
- * ImageDisplay}. The given {@link ComplexUnaryOperation} is applied on a pixel
- * by pixel basis.
+ * Helper class for use by many plugins that apply a
+ * {@link ComplexUnaryOperation} to some input image. The run() method modifies
+ * the current selection of the active {@link Dataset} of the given
+ * {@link ImageDisplay}. The given {@link ComplexUnaryOperation} is applied on a
+ * pixel by pixel basis.
  * 
  * @author Barry DeZonia
  */
@@ -60,77 +67,92 @@ public class InplaceUnaryTransform<I extends ComplexType<I>, O extends ComplexTy
 
 	// -- instance variables --
 
-	private final ImageAssignment<I,O,long[]> assigner1;
-	private final ImageAssignment<I,O,long[]> assigner2;
-	private final ImageAssignment<I,O,long[]> assigner3;
+	private final Ops.Map assigner1;
+	private final ImageAssignment<I, O, long[]> assigner2;
+	private final ImageAssignment<I, O, long[]> assigner3;
 	private final Dataset dataset;
 	private long[] origin;
 	private long[] span;
 	private Condition<long[]> condition;
+	
+	@Parameter
+	private OpService ops;
 
 	// -- constructor --
 
 	/** All planes version */
-	public InplaceUnaryTransform(
-			final ComplexUnaryOperation<O,O> operation,
-			O outType,
-			Dataset dataset,
-			Overlay overlay)
+	public InplaceUnaryTransform(final ComputerOp<O, O> operation, O outType,
+		Dataset dataset, Overlay overlay)
 	{
 		this.dataset = dataset;
 		setRegion(dataset, overlay);
 		@SuppressWarnings("unchecked")
-		final Img<I> img = (Img<I>)dataset.getImgPlus();
-		final ComplexImageFunction<I,O> f1 =
-				new ComplexImageFunction<I,O>(img, outType.createVariable());
-		final GeneralUnaryFunction<long[],O,O> function = new
-				GeneralUnaryFunction<long[],O,O>(
-					f1, operation, outType.createVariable());
+		final Img<I> img = (Img<I>) dataset.getImgPlus();
+
+		// some ComputerOp that accepts and Img in construction and for a given
+		// location (long[]), it converts the value of the Img at that location
+		// to type O and set it as the output value.
+		final RandomAccessibleInterval converter = new Converters.convert(img,
+			new ComplexRealFloatConverter<I, O>());
+//		final ComplexImageFunction<I,O> f1 =
+//				new ComplexImageFunction<I,O>(img, outType.createVariable());
+
+		final DefaultJoinComputerAndComputer<long[], O, O> function =
+			new DefaultJoinComputerAndComputer<long[], O, O>();
+		function.setFirst(f1);
+		function.setSecond(operation);
+//		final GeneralUnaryFunction<long[],O,O> function = new
+//				GeneralUnaryFunction<long[],O,O>(
+//					f1, operation, outType.createVariable());
+
 		final InputIteratorFactory<long[]> factory =
-				new PointInputIteratorFactory();
-		assigner1 =
-			new ImageAssignment<I,O, long[]>(img, origin, span, function,
-					condition, factory);
+			new PointInputIteratorFactory();
+//		assigner1 = new ImageAssignment<I, O, long[]>(img, origin, span, function,
+//			condition, factory);
+		assigner1 = ops.computer(Ops.Map.class, outType, inType, otherArgs);
 		assigner2 = null;
 		assigner3 = null;
 	}
 
 	/** Single plane versions */
-	public InplaceUnaryTransform(
-			final ComplexUnaryOperation<O,O> operation,
-			O outType,
-			Dataset dataset,
-			Overlay overlay,
-			Position planePos)
+	public InplaceUnaryTransform(final ComputerOp<O, O> operation, O outType,
+		Dataset dataset, Overlay overlay, Position planePos)
 	{
 		this.dataset = dataset;
 		setRegion(dataset, overlay, planePos);
 		@SuppressWarnings("unchecked")
-		final Img<I> img = (Img<I>)dataset.getImgPlus();
-		final ComplexImageFunction<I,O> f1 =
-				new ComplexImageFunction<I,O>(img, outType.createVariable());
-		final GeneralUnaryFunction<long[],O,O> function = new
-				GeneralUnaryFunction<long[],O,O>(
-					f1, operation, outType.createVariable());
+		final Img<I> img = (Img<I>) dataset.getImgPlus();
+		// some ComputerOp that accepts and Img in construction and for a given
+		// location (long[]), it converts the value of the Img at that location
+		// to type O and set it as the output value.
+		final ComputerOp<long[], O> f1;
+//		final ComplexImageFunction<I,O> f1 =
+//				new ComplexImageFunction<I,O>(img, outType.createVariable());
+
+		final DefaultJoinComputerAndComputer<long[], O, O> function =
+			new DefaultJoinComputerAndComputer<long[], O, O>();
+		function.setFirst(f1);
+		function.setSecond(operation);
+//		final GeneralUnaryFunction<long[],O,O> function = new
+//				GeneralUnaryFunction<long[],O,O>(
+//					f1, operation, outType.createVariable());
+
 		final InputIteratorFactory<long[]> factory =
-				new PointInputIteratorFactory();
+			new PointInputIteratorFactory();
 		boolean rgb = dataset.isRGBMerged();
 		int chIndex = dataset.dimensionIndex(Axes.CHANNEL);
 		if (rgb) {
 			origin[chIndex] = 0;
 		}
-		assigner1 =
-			new ImageAssignment<I,O, long[]>(img, origin, span, function,
-					condition, factory);
+		assigner1 = new ImageAssignment<I, O, long[]>(img, origin, span, function,
+			condition, factory);
 		if (rgb) {
 			origin[chIndex] = 1;
-			assigner2 =
-				new ImageAssignment<I,O, long[]>(img, origin, span, function,
-					condition, factory);
+			assigner2 = new ImageAssignment<I, O, long[]>(img, origin, span, function,
+				condition, factory);
 			origin[chIndex] = 2;
-			assigner3 =
-				new ImageAssignment<I,O, long[]>(img, origin, span, function,
-					condition, factory);
+			assigner3 = new ImageAssignment<I, O, long[]>(img, origin, span, function,
+				condition, factory);
 		}
 		else {
 			assigner2 = null;
@@ -138,7 +160,6 @@ public class InplaceUnaryTransform<I extends ComplexType<I>, O extends ComplexTy
 		}
 	}
 
-	
 	// -- public interface --
 
 	public void run() {
@@ -148,9 +169,13 @@ public class InplaceUnaryTransform<I extends ComplexType<I>, O extends ComplexTy
 		dataset.update();
 	}
 
-	public long[] getRegionOrigin() { return origin; }
-	
-	public long[] getRegionSpan() { return span; }
+	public long[] getRegionOrigin() {
+		return origin;
+	}
+
+	public long[] getRegionSpan() {
+		return span;
+	}
 
 	// -- private helpers --
 
@@ -160,12 +185,11 @@ public class InplaceUnaryTransform<I extends ComplexType<I>, O extends ComplexTy
 		// check dimensions of Dataset
 		final int xIndex = ds.dimensionIndex(Axes.X);
 		final int yIndex = ds.dimensionIndex(Axes.Y);
-		if ((xIndex < 0) || (yIndex < 0))
-			throw new IllegalArgumentException(
-				"display does not have XY planes");
-		
+		if ((xIndex < 0) || (yIndex < 0)) throw new IllegalArgumentException(
+			"display does not have XY planes");
+
 		LongRect rect = findXYRegion(ds, overlay, xIndex, yIndex);
-		
+
 		// calc origin and span values
 		origin = new long[ds.numDimensions()];
 		span = new long[ds.numDimensions()];
@@ -183,10 +207,10 @@ public class InplaceUnaryTransform<I extends ComplexType<I>, O extends ComplexTy
 				span[i] = ds.dimension(i);
 			}
 		}
-		
+
 		condition = null;
-		if (overlay != null)
-			condition = new UVInsideRoiCondition(overlay.getRegionOfInterest());
+		if (overlay != null) condition = new UVInsideRoiCondition(overlay
+			.getRegionOfInterest());
 	}
 
 	/** Single plane version */
@@ -195,12 +219,11 @@ public class InplaceUnaryTransform<I extends ComplexType<I>, O extends ComplexTy
 		// check dimensions of Dataset
 		final int xIndex = ds.dimensionIndex(Axes.X);
 		final int yIndex = ds.dimensionIndex(Axes.Y);
-		if ((xIndex < 0) || (yIndex < 0))
-			throw new IllegalArgumentException(
-				"display does not have XY planes");
-		
+		if ((xIndex < 0) || (yIndex < 0)) throw new IllegalArgumentException(
+			"display does not have XY planes");
+
 		LongRect rect = findXYRegion(ds, overlay, xIndex, yIndex);
-		
+
 		// calc origin and span values
 		origin = new long[ds.numDimensions()];
 		span = new long[ds.numDimensions()];
@@ -219,13 +242,15 @@ public class InplaceUnaryTransform<I extends ComplexType<I>, O extends ComplexTy
 				span[i] = 1;
 			}
 		}
-		
+
 		condition = null;
-		if (overlay != null)
-			condition = new UVInsideRoiCondition(overlay.getRegionOfInterest());
+		if (overlay != null) condition = new UVInsideRoiCondition(overlay
+			.getRegionOfInterest());
 	}
 
-	private LongRect findXYRegion(Dataset ds, Overlay overlay, int xIndex, int yIndex) {
+	private LongRect findXYRegion(Dataset ds, Overlay overlay, int xIndex,
+		int yIndex)
+	{
 
 		// calc XY outline boundary
 		final LongRect rect = new LongRect();
@@ -243,8 +268,9 @@ public class InplaceUnaryTransform<I extends ComplexType<I>, O extends ComplexTy
 		}
 		return rect;
 	}
-	
+
 	private class LongRect {
+
 		public long x, y, w, h;
 	}
 }

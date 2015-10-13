@@ -31,16 +31,16 @@
 
 package net.imagej.plugins.commands.assign;
 
-import net.imglib2.ops.operation.real.unary.RealXorConstant;
-import net.imglib2.type.numeric.RealType;
-import net.imglib2.type.numeric.real.DoubleType;
-
 import org.scijava.command.Command;
 import org.scijava.menu.MenuConstants;
 import org.scijava.plugin.Attr;
 import org.scijava.plugin.Menu;
 import org.scijava.plugin.Parameter;
 import org.scijava.plugin.Plugin;
+
+import net.imagej.ops.math.RealMath.XorConstant;
+import net.imglib2.type.numeric.RealType;
+import net.imglib2.type.numeric.real.DoubleType;
 
 /**
  * Fills an output Dataset by XORing an input Dataset with a user defined
@@ -70,8 +70,9 @@ public class XorDataValuesWith<T extends RealType<T>>
 	}
 
 	@Override
-	public RealXorConstant<DoubleType, DoubleType> getOperation() {
-		return new RealXorConstant<DoubleType, DoubleType>(value);
+	public XorConstant<DoubleType, DoubleType> getOperation() {
+		return (XorConstant<DoubleType, DoubleType>) opService.computer(
+			XorConstant.class, DoubleType.class, DoubleType.class, value);
 	}
 
 	public long getValue() {

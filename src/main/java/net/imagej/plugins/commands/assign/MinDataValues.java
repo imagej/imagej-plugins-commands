@@ -31,16 +31,16 @@
 
 package net.imagej.plugins.commands.assign;
 
-import net.imglib2.ops.operation.real.unary.RealMinConstant;
-import net.imglib2.type.numeric.RealType;
-import net.imglib2.type.numeric.real.DoubleType;
-
 import org.scijava.command.Command;
 import org.scijava.menu.MenuConstants;
 import org.scijava.plugin.Attr;
 import org.scijava.plugin.Menu;
 import org.scijava.plugin.Parameter;
 import org.scijava.plugin.Plugin;
+
+import net.imagej.ops.math.RealMath.MinConstant;
+import net.imglib2.type.numeric.RealType;
+import net.imglib2.type.numeric.real.DoubleType;
 
 /**
  * Fills an output Dataset by clamping an input Dataset such that no values are
@@ -70,8 +70,9 @@ public class MinDataValues<T extends RealType<T>>
 	}
 
 	@Override
-	public RealMinConstant<DoubleType, DoubleType> getOperation() {
-		return new RealMinConstant<DoubleType, DoubleType>(value);
+	public MinConstant<DoubleType, DoubleType> getOperation() {
+		return (MinConstant<DoubleType, DoubleType>) opService.computer(
+			MinConstant.class, DoubleType.class, DoubleType.class, value);
 	}
 
 	public double getValue() {

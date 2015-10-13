@@ -31,16 +31,16 @@
 
 package net.imagej.plugins.commands.assign;
 
-import net.imglib2.ops.operation.real.unary.RealSubtractConstant;
-import net.imglib2.type.numeric.RealType;
-import net.imglib2.type.numeric.real.DoubleType;
-
 import org.scijava.command.Command;
 import org.scijava.menu.MenuConstants;
 import org.scijava.plugin.Attr;
 import org.scijava.plugin.Menu;
 import org.scijava.plugin.Parameter;
 import org.scijava.plugin.Plugin;
+
+import net.imagej.ops.math.RealMath.Subtract;
+import net.imglib2.type.numeric.RealType;
+import net.imglib2.type.numeric.real.DoubleType;
 
 /**
  * Fills an output Dataset by subtracting a user defined constant value from an
@@ -70,8 +70,9 @@ public class SubtractFromDataValues<T extends RealType<T>>
 	}
 
 	@Override
-	public RealSubtractConstant<DoubleType, DoubleType> getOperation() {
-		return new RealSubtractConstant<DoubleType, DoubleType>(value);
+	public Subtract<DoubleType, DoubleType> getOperation() {
+		return (Subtract<DoubleType, DoubleType>) opService.computer(
+			Subtract.class, DoubleType.class, DoubleType.class, value);
 	}
 
 	public double getValue() {

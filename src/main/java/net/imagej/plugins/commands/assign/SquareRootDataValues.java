@@ -31,24 +31,15 @@
 
 package net.imagej.plugins.commands.assign;
 
-import net.imagej.Dataset;
-import net.imagej.display.DatasetView;
-import net.imagej.display.ImageDisplay;
-import net.imagej.display.ImageDisplayService;
-import net.imagej.display.OverlayService;
-import net.imagej.overlay.Overlay;
-import net.imglib2.ops.operation.real.unary.RealSqrt;
-import net.imglib2.type.numeric.RealType;
-import net.imglib2.type.numeric.real.DoubleType;
-
-import org.scijava.ItemIO;
 import org.scijava.command.Command;
-import org.scijava.command.ContextCommand;
 import org.scijava.menu.MenuConstants;
 import org.scijava.plugin.Attr;
 import org.scijava.plugin.Menu;
-import org.scijava.plugin.Parameter;
 import org.scijava.plugin.Plugin;
+
+import net.imagej.ops.math.RealMath.Sqrt;
+import net.imglib2.type.numeric.RealType;
+import net.imglib2.type.numeric.real.DoubleType;
 
 /**
  * Fills an output Dataset by taking the square root of the data values of an
@@ -63,63 +54,18 @@ import org.scijava.plugin.Plugin;
 	@Menu(label = "Math", mnemonic = 'm'),
 	@Menu(label = "Square Root...", weight = 16) }, headless = true, attrs = { @Attr(name = "no-legacy") })
 public class SquareRootDataValues<T extends RealType<T>>
-	extends ContextCommand
+	extends MathCommand<T, DoubleType>
 {
-
-	// -- instance variables that are Parameters --
-
-	@Parameter
-	private OverlayService overlayService;
-
-	@Parameter
-	private ImageDisplayService imgDispService;
-
-	@Parameter(type = ItemIO.BOTH)
-	private ImageDisplay display;
-	
-	@Parameter(label = "Apply to all planes")
-	private boolean allPlanes;
-
 	// -- public interface --
 
-	@Override
-	public void run() {
-		Dataset dataset = imgDispService.getActiveDataset(display);
-		Overlay overlay = overlayService.getActiveOverlay(display);
-		DatasetView view = imgDispService.getActiveDatasetView(display);
-		
-		final RealSqrt<DoubleType, DoubleType> op =
-			new RealSqrt<DoubleType, DoubleType>();
-		
-		final InplaceUnaryTransform<T, DoubleType> transform;
-		
-		if (allPlanes)
-			transform = 
-				new InplaceUnaryTransform<T, DoubleType>(
-					op, new DoubleType(), dataset, overlay);
-		else
-			transform = 
-				new InplaceUnaryTransform<T, DoubleType>(
-					op, new DoubleType(), dataset, overlay,
-					view.getPlanePosition());
-		
-		transform.run();
-	}
-
-	public ImageDisplay getDisplay() {
-		return display;
-	}
-
-	public void setDisplay(ImageDisplay display) {
-		this.display = display;
-	}
-
-	public boolean isAllPlanes() {
-		return allPlanes;
+	public SquareRootDataValues() {
+		super(new DoubleType());
 	}
 	
-	public void setAllPlanes(boolean value) {
-		this.allPlanes = value;
+	@Override
+	public Sqrt<DoubleType, DoubleType> getOperation() {
+		return (Sqrt<DoubleType, DoubleType>) opService.computer(
+			Sqrt.class, DoubleType.class, DoubleType.class);
 	}
 
 }

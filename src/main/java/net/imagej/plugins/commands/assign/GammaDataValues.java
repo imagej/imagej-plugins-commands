@@ -31,16 +31,16 @@
 
 package net.imagej.plugins.commands.assign;
 
-import net.imglib2.ops.operation.real.unary.RealGammaConstant;
-import net.imglib2.type.numeric.RealType;
-import net.imglib2.type.numeric.real.DoubleType;
-
 import org.scijava.command.Command;
 import org.scijava.menu.MenuConstants;
 import org.scijava.plugin.Attr;
 import org.scijava.plugin.Menu;
 import org.scijava.plugin.Parameter;
 import org.scijava.plugin.Plugin;
+
+import net.imagej.ops.math.RealMath.GammaConstant;
+import net.imglib2.type.numeric.RealType;
+import net.imglib2.type.numeric.real.DoubleType;
 
 /**
  * Fills an output Dataset with the result of applying the gamma function to an
@@ -71,8 +71,9 @@ public class GammaDataValues<T extends RealType<T>> extends
 	}
 
 	@Override
-	public RealGammaConstant<DoubleType, DoubleType> getOperation() {
-		return new RealGammaConstant<DoubleType, DoubleType>(value);
+	public GammaConstant<DoubleType, DoubleType> getOperation() {
+		return (GammaConstant<DoubleType, DoubleType>) opService.computer(
+			GammaConstant.class, DoubleType.class, DoubleType.class, value);
 	}
 
 	public double getValue() {

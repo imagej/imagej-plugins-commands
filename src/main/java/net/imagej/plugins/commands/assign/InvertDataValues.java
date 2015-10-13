@@ -31,27 +31,20 @@
 
 package net.imagej.plugins.commands.assign;
 
-import net.imagej.Dataset;
-import net.imagej.display.DatasetView;
-import net.imagej.display.ImageDisplay;
-import net.imagej.display.ImageDisplayService;
-import net.imagej.display.OverlayService;
-import net.imagej.options.OptionsCompatibility;
-import net.imagej.overlay.Overlay;
-import net.imglib2.Cursor;
-import net.imglib2.ops.operation.real.unary.RealInvert;
-import net.imglib2.type.numeric.RealType;
-import net.imglib2.type.numeric.real.DoubleType;
-
-import org.scijava.ItemIO;
 import org.scijava.command.Command;
-import org.scijava.command.ContextCommand;
 import org.scijava.menu.MenuConstants;
 import org.scijava.options.OptionsService;
 import org.scijava.plugin.Attr;
 import org.scijava.plugin.Menu;
 import org.scijava.plugin.Parameter;
 import org.scijava.plugin.Plugin;
+
+import net.imagej.Dataset;
+import net.imagej.ops.math.RealMath.Invert;
+import net.imagej.options.OptionsCompatibility;
+import net.imglib2.Cursor;
+import net.imglib2.type.numeric.RealType;
+import net.imglib2.type.numeric.real.DoubleType;
 
 /**
  * Fills an output Dataset by applying an inversion to an input Dataset's data
@@ -66,24 +59,18 @@ import org.scijava.plugin.Plugin;
 		mnemonic = MenuConstants.EDIT_MNEMONIC),
 	@Menu(label = "Invert...", weight = 30, accelerator = "shift ^I") },
 	headless = true, attrs = { @Attr(name = "no-legacy") })
-public class InvertDataValues<T extends RealType<T>> extends ContextCommand {
+public class InvertDataValues<T extends RealType<T>> extends
+	MathCommand<T, DoubleType>
+{
 
 	// -- instance variables that are Parameters --
 
-	@Parameter
-	private OverlayService overlayService;
-
-	@Parameter
-	private ImageDisplayService imgDispService;
+	public InvertDataValues() {
+		super(new DoubleType());
+	}
 
 	@Parameter
 	private OptionsService optionsService;
-
-	@Parameter(type = ItemIO.BOTH)
-	private ImageDisplay display;
-
-	@Parameter(label = "Apply to all planes")
-	private boolean allPlanes;
 
 	// -- other instance variables --
 	
@@ -92,11 +79,9 @@ public class InvertDataValues<T extends RealType<T>> extends ContextCommand {
 	// -- public interface --
 
 	@Override
-	public void run() {
-		Dataset dataset = imgDispService.getActiveDataset(display);
-		Overlay overlay = overlayService.getActiveOverlay(display);
-		DatasetView view = imgDispService.getActiveDatasetView(display);
-		OptionsCompatibility options = optionsService.getOptions(OptionsCompatibility.class);
+	public Invert<DoubleType, DoubleType> getOperation() {
+		final OptionsCompatibility options = optionsService.getOptions(OptionsCompatibility.class);
+		final Dataset dataset = getDataset();
 		
 		if (options.isInvertModeLegacy() && dataset.isInteger() &&
 				!dataset.isSigned() && dataset.getType().getBitsPerPixel() == 8)
@@ -106,38 +91,8 @@ public class InvertDataValues<T extends RealType<T>> extends ContextCommand {
 		}
 		else calcValueRange(dataset);
 
-		final RealInvert<DoubleType, DoubleType> op =
-			new RealInvert<DoubleType, DoubleType>(min, max);
-		
-		final InplaceUnaryTransform<T, DoubleType> transform;
-		
-		if (allPlanes)
-			transform = 
-				new InplaceUnaryTransform<T, DoubleType>(
-					op, new DoubleType(), dataset, overlay);
-		else
-			transform = 
-				new InplaceUnaryTransform<T, DoubleType>(
-					op, new DoubleType(), dataset, overlay,
-					view.getPlanePosition());
-		
-		transform.run();
-	}
-
-	public ImageDisplay getDisplay() {
-		return display;
-	}
-
-	public void setDisplay(ImageDisplay display) {
-		this.display = display;
-	}
-
-	public boolean isAllPlanes() {
-		return allPlanes;
-	}
-	
-	public void setAllPlanes(boolean value) {
-		this.allPlanes = value;
+		return (Invert<DoubleType, DoubleType>) opService.computer(
+			Invert.class, DoubleType.class, DoubleType.class, min, max);
 	}
 
 	// -- private interface --

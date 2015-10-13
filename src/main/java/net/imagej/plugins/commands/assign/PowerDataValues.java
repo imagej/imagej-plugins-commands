@@ -31,16 +31,16 @@
 
 package net.imagej.plugins.commands.assign;
 
-import net.imglib2.ops.operation.real.unary.RealPowerConstant;
-import net.imglib2.type.numeric.RealType;
-import net.imglib2.type.numeric.real.DoubleType;
-
 import org.scijava.command.Command;
 import org.scijava.menu.MenuConstants;
 import org.scijava.plugin.Attr;
 import org.scijava.plugin.Menu;
 import org.scijava.plugin.Parameter;
 import org.scijava.plugin.Plugin;
+
+import net.imagej.ops.math.RealMath.PowerConstant;
+import net.imglib2.type.numeric.RealType;
+import net.imglib2.type.numeric.real.DoubleType;
 
 /**
  * Fills an output Dataset by raising input Dataset values to a user defined
@@ -71,8 +71,9 @@ public class PowerDataValues<T extends RealType<T>> extends
 	}
 
 	@Override
-	public RealPowerConstant<DoubleType, DoubleType> getOperation() {
-		return new RealPowerConstant<DoubleType, DoubleType>(value);
+	public PowerConstant<DoubleType, DoubleType> getOperation() {
+		return (PowerConstant<DoubleType, DoubleType>) opService.computer(
+			PowerConstant.class, DoubleType.class, DoubleType.class, value);
 	}
 
 	public double getValue() {

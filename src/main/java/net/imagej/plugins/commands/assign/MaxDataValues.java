@@ -31,16 +31,17 @@
 
 package net.imagej.plugins.commands.assign;
 
-import net.imglib2.ops.operation.real.unary.RealMaxConstant;
-import net.imglib2.type.numeric.RealType;
-import net.imglib2.type.numeric.real.DoubleType;
-
 import org.scijava.command.Command;
 import org.scijava.menu.MenuConstants;
 import org.scijava.plugin.Attr;
 import org.scijava.plugin.Menu;
 import org.scijava.plugin.Parameter;
 import org.scijava.plugin.Plugin;
+
+import net.imagej.ops.math.RealMath.MaxConstant;
+import net.imagej.ops.math.RealMath.MinConstant;
+import net.imglib2.type.numeric.RealType;
+import net.imglib2.type.numeric.real.DoubleType;
 
 /**
  * Fills an output Dataset by clamping an input Dataset such that no values are
@@ -71,8 +72,9 @@ public class MaxDataValues<T extends RealType<T>> extends
 	}
 
 	@Override
-	public RealMaxConstant<DoubleType, DoubleType> getOperation() {
-		return new RealMaxConstant<DoubleType, DoubleType>(value);
+	public MaxConstant<DoubleType, DoubleType> getOperation() {
+		return (MaxConstant<DoubleType, DoubleType>) opService.computer(
+			MaxConstant.class, DoubleType.class, DoubleType.class, value);
 	}
 
 	public double getValue() {

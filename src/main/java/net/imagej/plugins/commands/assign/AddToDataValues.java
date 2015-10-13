@@ -31,16 +31,16 @@
 
 package net.imagej.plugins.commands.assign;
 
-import net.imglib2.ops.operation.real.unary.RealAddConstant;
-import net.imglib2.type.numeric.RealType;
-import net.imglib2.type.numeric.real.DoubleType;
-
 import org.scijava.command.Command;
 import org.scijava.menu.MenuConstants;
 import org.scijava.plugin.Attr;
 import org.scijava.plugin.Menu;
 import org.scijava.plugin.Parameter;
 import org.scijava.plugin.Plugin;
+
+import net.imagej.ops.math.RealMath.Add;
+import net.imglib2.type.numeric.RealType;
+import net.imglib2.type.numeric.real.DoubleType;
 
 /**
  * Fills an output Dataset by adding a user defined constant value to an input
@@ -82,7 +82,8 @@ public class AddToDataValues<T extends RealType<T>>
 	// -- private helpers --
 	
 	@Override
-	public RealAddConstant<DoubleType,DoubleType> getOperation() {
-		return new RealAddConstant<DoubleType,DoubleType>(value);
+	public Add<DoubleType,DoubleType> getOperation() {
+		return (Add<DoubleType, DoubleType>) opService.computer(
+			Add.class, DoubleType.class, DoubleType.class, value);
 	}
 }

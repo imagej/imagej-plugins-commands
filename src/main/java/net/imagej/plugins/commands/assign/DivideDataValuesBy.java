@@ -31,11 +31,6 @@
 
 package net.imagej.plugins.commands.assign;
 
-import net.imagej.options.OptionsMisc;
-import net.imglib2.ops.operation.real.unary.RealDivideConstant;
-import net.imglib2.type.numeric.RealType;
-import net.imglib2.type.numeric.real.DoubleType;
-
 import org.scijava.command.Command;
 import org.scijava.menu.MenuConstants;
 import org.scijava.options.OptionsService;
@@ -43,6 +38,12 @@ import org.scijava.plugin.Attr;
 import org.scijava.plugin.Menu;
 import org.scijava.plugin.Parameter;
 import org.scijava.plugin.Plugin;
+
+import net.imagej.ops.math.RealMath.Divide;
+import net.imagej.options.OptionsMisc;
+import net.imglib2.ops.operation.real.unary.RealDivideConstant;
+import net.imglib2.type.numeric.RealType;
+import net.imglib2.type.numeric.real.DoubleType;
 
 /**
  * Fills an output Dataset by dividing an input Dataset by a user defined
@@ -75,7 +76,7 @@ public class DivideDataValuesBy<T extends RealType<T>>
 	}
 
 	@Override
-	public RealDivideConstant<DoubleType, DoubleType> getOperation() {
+	public Divide<DoubleType, DoubleType> getOperation() {
 		final OptionsMisc optionsMisc =
 			optionsService.getOptions(OptionsMisc.class);
 		final String dbzString = optionsMisc.getDivByZeroVal();
@@ -86,7 +87,8 @@ public class DivideDataValuesBy<T extends RealType<T>>
 		catch (final NumberFormatException e) {
 			dbzVal = Double.POSITIVE_INFINITY;
 		}
-		return new RealDivideConstant<DoubleType, DoubleType>(value, dbzVal);
+		return (Divide<DoubleType, DoubleType>) opService.computer(
+			Divide.class, DoubleType.class, DoubleType.class, value, dbzVal);
 	}
 
 	public double getValue() {

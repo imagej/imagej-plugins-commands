@@ -31,16 +31,16 @@
 
 package net.imagej.plugins.commands.assign;
 
-import net.imglib2.ops.operation.real.unary.RealMultiplyConstant;
-import net.imglib2.type.numeric.RealType;
-import net.imglib2.type.numeric.real.DoubleType;
-
 import org.scijava.command.Command;
 import org.scijava.menu.MenuConstants;
 import org.scijava.plugin.Attr;
 import org.scijava.plugin.Menu;
 import org.scijava.plugin.Parameter;
 import org.scijava.plugin.Plugin;
+
+import net.imagej.ops.math.RealMath.Multiply;
+import net.imglib2.type.numeric.RealType;
+import net.imglib2.type.numeric.real.DoubleType;
 
 /**
  * Fills an output Dataset by multiplying an input Dataset by a user defined
@@ -70,8 +70,9 @@ public class MultiplyDataValuesBy<T extends RealType<T>>
 	}
 
 	@Override
-	public RealMultiplyConstant<DoubleType, DoubleType> getOperation() {
-		return new RealMultiplyConstant<DoubleType, DoubleType>(value);
+	public Multiply<DoubleType, DoubleType> getOperation() {
+		return (Multiply<DoubleType, DoubleType>) opService.computer(
+			Multiply.class, DoubleType.class, DoubleType.class, value);
 	}
 
 	public double getValue() {
