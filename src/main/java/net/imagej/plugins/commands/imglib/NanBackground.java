@@ -31,16 +31,6 @@
 
 package net.imagej.plugins.commands.imglib;
 
-import net.imagej.Dataset;
-import net.imagej.display.ImageDisplay;
-import net.imagej.display.ImageDisplayService;
-import net.imagej.overlay.ThresholdOverlay;
-import net.imagej.threshold.ThresholdService;
-import net.imglib2.RandomAccess;
-import net.imglib2.ops.pointset.PointSet;
-import net.imglib2.ops.pointset.PointSetIterator;
-import net.imglib2.type.numeric.RealType;
-
 import org.scijava.ItemIO;
 import org.scijava.command.Command;
 import org.scijava.command.ContextCommand;
@@ -50,6 +40,18 @@ import org.scijava.plugin.Menu;
 import org.scijava.plugin.Parameter;
 import org.scijava.plugin.Plugin;
 
+import net.imagej.Dataset;
+import net.imagej.display.ImageDisplay;
+import net.imagej.display.ImageDisplayService;
+import net.imagej.ops.Conditional;
+import net.imagej.ops.OpService;
+import net.imagej.ops.Ops;
+import net.imagej.ops.threshold.AbstractApplyThresholdImg;
+import net.imglib2.img.Img;
+import net.imglib2.type.logic.BitType;
+import net.imglib2.type.numeric.RealType;
+import net.imglib2.type.numeric.real.DoubleType;
+
 /**
  * Fills the background pixels of an image with NaN. The image is defined as the
  * active Dataset of a given ImageDisplay. The input image must be a thresholded
@@ -58,24 +60,29 @@ import org.scijava.plugin.Plugin;
  * 
  * @author Barry DeZonia
  */
-@Plugin(type = Command.class, menu = {
-	@Menu(label = MenuConstants.PROCESS_LABEL,
-		weight = MenuConstants.PROCESS_WEIGHT,
-		mnemonic = MenuConstants.PROCESS_MNEMONIC),
-	@Menu(label = "Math", mnemonic = 'm'),
-	@Menu(label = "NaN Background", weight = 18) }, headless = true, attrs = { @Attr(name = "no-legacy") })
+@Plugin(type = Command.class, menu = { @Menu(
+	label = MenuConstants.PROCESS_LABEL, weight = MenuConstants.PROCESS_WEIGHT,
+	mnemonic = MenuConstants.PROCESS_MNEMONIC), @Menu(label = "Math",
+		mnemonic = 'm'), @Menu(label = "NaN Background", weight = 18) },
+	headless = true, attrs = { @Attr(name = "no-legacy") })
 public class NanBackground extends ContextCommand {
 
 	// -- Parameters --
 
-	@Parameter
-	private ThresholdService threshSrv;
+//	@Parameter
+//	private ThresholdService threshSrv;
 
 	@Parameter
 	private ImageDisplayService dispSrv;
 
 	@Parameter(type = ItemIO.BOTH)
 	private ImageDisplay display;
+
+	@Parameter
+	private AbstractApplyThresholdImg<? extends RealType<?>, Img<? extends RealType<?>>> applyThreshold;
+
+	@Parameter
+	private OpService ops;
 
 	// -- instance variables --
 
@@ -94,7 +101,7 @@ public class NanBackground extends ContextCommand {
 	public void setDisplay(ImageDisplay display) {
 		this.display = display;
 	}
-	
+
 	public ImageDisplay getDisplay() {
 		return display;
 	}
@@ -115,24 +122,30 @@ public class NanBackground extends ContextCommand {
 			cancel("Input ImgPlus is null");
 			return true;
 		}
-		if (!threshSrv.hasThreshold(display)) {
-			cancel("Input image is not thresholded");
-			return true;
-		}
+//		if (!threshSrv.hasThreshold(display)) {
+//			cancel("Input image is not thresholded");
+//			return true;
+//		}
 		return false;
 	}
 
 	private void assignPixels() {
-		ThresholdOverlay thresh = threshSrv.getThreshold(display);
-		PointSet ps = thresh.getPointsOutside();
-		PointSetIterator iter = ps.iterator();
-		RandomAccess<? extends RealType<?>> accessor =
-			input.getImgPlus().randomAccess();
-		while (iter.hasNext()) {
-			long[] pos = iter.next();
-			accessor.setPosition(pos);
-			accessor.get().setReal(Double.NaN);
-		}
+//		ThresholdOverlay thresh = threshSrv.getThreshold(display);
+//		PointSet ps = thresh.getPointsOutside();
+//		PointSetIterator iter = ps.iterator();
+//		RandomAccess<? extends RealType<?>> accessor =
+//			input.getImgPlus().randomAccess();
+//		while (iter.hasNext()) {
+//			long[] pos = iter.next();
+//			accessor.setPosition(pos);
+//			accessor.get().setReal(Double.NaN);
+//		}
+		final Img<BitType> bitMask = applyThreshold.compute(input.getImgPlus());
+		final Img<? extends RealType<?>> image = input.getImgPlus();
+		Conditional<BitType, DoubleType> conditional =
+			new Conditional<BitType, DoubleType>(new BitType(), new DoubleType(
+				Double.NaN), null);
+		ops.run(Ops.Map.class, image, bitMask, conditional);
 	}
 
 }
