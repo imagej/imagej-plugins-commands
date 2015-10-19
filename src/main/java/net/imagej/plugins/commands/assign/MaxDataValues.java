@@ -39,7 +39,6 @@ import org.scijava.plugin.Parameter;
 import org.scijava.plugin.Plugin;
 
 import net.imagej.ops.math.RealMath.MaxConstant;
-import net.imagej.ops.math.RealMath.MinConstant;
 import net.imglib2.type.numeric.RealType;
 import net.imglib2.type.numeric.real.DoubleType;
 
