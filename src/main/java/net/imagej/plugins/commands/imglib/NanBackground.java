@@ -43,7 +43,7 @@ import org.scijava.plugin.Plugin;
 import net.imagej.Dataset;
 import net.imagej.display.ImageDisplay;
 import net.imagej.display.ImageDisplayService;
-import net.imagej.ops.Conditional;
+import net.imagej.ops.ComputerOp;
 import net.imagej.ops.OpService;
 import net.imagej.ops.Ops;
 import net.imagej.ops.threshold.AbstractApplyThresholdImg;
@@ -140,12 +140,13 @@ public class NanBackground extends ContextCommand {
 //			accessor.setPosition(pos);
 //			accessor.get().setReal(Double.NaN);
 //		}
-		final Img<BitType> bitMask = applyThreshold.compute(input.getImgPlus());
+		final Img<BitType> background = applyThreshold.compute(input.getImgPlus());
 		final Img<? extends RealType<?>> image = input.getImgPlus();
-		Conditional<BitType, DoubleType> conditional =
-			new Conditional<BitType, DoubleType>(new BitType(), new DoubleType(
-				Double.NaN), null);
-		ops.run(Ops.Map.class, image, bitMask, conditional);
+		final BitType bType = new BitType();
+		final DoubleType nan = new DoubleType(Double.NaN);
+		final ComputerOp<BitType, DoubleType> conditional = ops.computer(
+			Ops.If.class, nan, bType, nan);
+		ops.run(Ops.Map.class, image, background, conditional);
 	}
 
 }
