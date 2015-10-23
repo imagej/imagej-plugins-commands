@@ -41,7 +41,6 @@ import org.scijava.plugin.Plugin;
 
 import net.imagej.ops.math.RealMath.Divide;
 import net.imagej.options.OptionsMisc;
-import net.imglib2.ops.operation.real.unary.RealDivideConstant;
 import net.imglib2.type.numeric.RealType;
 import net.imglib2.type.numeric.real.DoubleType;
 
