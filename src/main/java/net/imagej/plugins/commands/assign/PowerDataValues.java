@@ -38,7 +38,8 @@ import org.scijava.plugin.Menu;
 import org.scijava.plugin.Parameter;
 import org.scijava.plugin.Plugin;
 
-import net.imagej.ops.math.RealMath.PowerConstant;
+import net.imagej.ops.ComputerOp;
+import net.imagej.ops.Ops;
 import net.imglib2.type.numeric.RealType;
 import net.imglib2.type.numeric.real.DoubleType;
 
@@ -48,13 +49,11 @@ import net.imglib2.type.numeric.real.DoubleType;
  * 
  * @author Barry DeZonia
  */
-@Plugin(type = Command.class,
-	menu = {
-		@Menu(label = MenuConstants.PROCESS_LABEL,
-			weight = MenuConstants.PROCESS_WEIGHT,
-			mnemonic = MenuConstants.PROCESS_MNEMONIC),
-		@Menu(label = "Math", mnemonic = 'm'),
-		@Menu(label = "Power...", weight = 5) }, headless = true, attrs = { @Attr(name = "no-legacy") })
+@Plugin(type = Command.class, menu = { @Menu(
+	label = MenuConstants.PROCESS_LABEL, weight = MenuConstants.PROCESS_WEIGHT,
+	mnemonic = MenuConstants.PROCESS_MNEMONIC), @Menu(label = "Math",
+		mnemonic = 'm'), @Menu(label = "Power...", weight = 5) }, headless = true,
+	attrs = { @Attr(name = "no-legacy") })
 public class PowerDataValues<T extends RealType<T>> extends
 	MathCommand<T, DoubleType>
 {
@@ -71,9 +70,9 @@ public class PowerDataValues<T extends RealType<T>> extends
 	}
 
 	@Override
-	public PowerConstant<DoubleType, DoubleType> getOperation() {
-		return (PowerConstant<DoubleType, DoubleType>) opService.computer(
-			PowerConstant.class, DoubleType.class, DoubleType.class, value);
+	public ComputerOp<DoubleType, DoubleType> getOperation() {
+		return opService.computer(Ops.Math.Power.class, DoubleType.class,
+			DoubleType.class, value);
 	}
 
 	public double getValue() {

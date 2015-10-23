@@ -38,7 +38,8 @@ import org.scijava.plugin.Menu;
 import org.scijava.plugin.Parameter;
 import org.scijava.plugin.Plugin;
 
-import net.imagej.ops.math.RealMath.XorConstant;
+import net.imagej.ops.ComputerOp;
+import net.imagej.ops.Ops;
 import net.imglib2.type.numeric.RealType;
 import net.imglib2.type.numeric.real.DoubleType;
 
@@ -48,14 +49,13 @@ import net.imglib2.type.numeric.real.DoubleType;
  * 
  * @author Barry DeZonia
  */
-@Plugin(type = Command.class, menu = {
-	@Menu(label = MenuConstants.PROCESS_LABEL,
-		weight = MenuConstants.PROCESS_WEIGHT,
-		mnemonic = MenuConstants.PROCESS_MNEMONIC),
-	@Menu(label = "Math", mnemonic = 'm'), @Menu(label = "XOR...", weight = 8) },
-	headless = true, attrs = { @Attr(name = "no-legacy") })
-public class XorDataValuesWith<T extends RealType<T>>
-	extends MathCommand<T,DoubleType>
+@Plugin(type = Command.class, menu = { @Menu(
+	label = MenuConstants.PROCESS_LABEL, weight = MenuConstants.PROCESS_WEIGHT,
+	mnemonic = MenuConstants.PROCESS_MNEMONIC), @Menu(label = "Math",
+		mnemonic = 'm'), @Menu(label = "XOR...", weight = 8) }, headless = true,
+	attrs = { @Attr(name = "no-legacy") })
+public class XorDataValuesWith<T extends RealType<T>> extends
+	MathCommand<T, DoubleType>
 {
 
 	// -- instance variables that are Parameters --
@@ -70,9 +70,9 @@ public class XorDataValuesWith<T extends RealType<T>>
 	}
 
 	@Override
-	public XorConstant<DoubleType, DoubleType> getOperation() {
-		return (XorConstant<DoubleType, DoubleType>) opService.computer(
-			XorConstant.class, DoubleType.class, DoubleType.class, value);
+	public ComputerOp<DoubleType, DoubleType> getOperation() {
+		return opService.computer(Ops.Math.Xor.class, DoubleType.class,
+			DoubleType.class, value);
 	}
 
 	public long getValue() {

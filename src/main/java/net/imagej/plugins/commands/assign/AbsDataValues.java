@@ -37,7 +37,8 @@ import org.scijava.plugin.Attr;
 import org.scijava.plugin.Menu;
 import org.scijava.plugin.Plugin;
 
-import net.imagej.ops.math.RealMath.Abs;
+import net.imagej.ops.ComputerOp;
+import net.imagej.ops.Ops;
 import net.imglib2.type.numeric.RealType;
 import net.imglib2.type.numeric.real.DoubleType;
 
@@ -47,13 +48,13 @@ import net.imglib2.type.numeric.real.DoubleType;
  * 
  * @author Barry DeZonia
  */
-@Plugin(type = Command.class, menu = {
-	@Menu(label = MenuConstants.PROCESS_LABEL,
-		weight = MenuConstants.PROCESS_WEIGHT,
-		mnemonic = MenuConstants.PROCESS_MNEMONIC),
-	@Menu(label = "Math", mnemonic = 'm'), @Menu(label = "Abs...", weight = 19) },
-	headless = true, attrs = { @Attr(name = "no-legacy") })
-public class AbsDataValues<T extends RealType<T>> extends MathCommand<T, DoubleType>
+@Plugin(type = Command.class, menu = { @Menu(
+	label = MenuConstants.PROCESS_LABEL, weight = MenuConstants.PROCESS_WEIGHT,
+	mnemonic = MenuConstants.PROCESS_MNEMONIC), @Menu(label = "Math",
+		mnemonic = 'm'), @Menu(label = "Abs...", weight = 19) }, headless = true,
+	attrs = { @Attr(name = "no-legacy") })
+public class AbsDataValues<T extends RealType<T>> extends
+	MathCommand<T, DoubleType>
 {
 
 	// -- public interface --
@@ -63,9 +64,9 @@ public class AbsDataValues<T extends RealType<T>> extends MathCommand<T, DoubleT
 	}
 
 	@Override
-	public Abs<DoubleType, DoubleType> getOperation() {
-		return (Abs<DoubleType, DoubleType>) opService.computer(
-			Abs.class, DoubleType.class, DoubleType.class);
+	public ComputerOp<DoubleType, DoubleType> getOperation() {
+		return opService.computer(Ops.Math.Abs.class, DoubleType.class,
+			DoubleType.class);
 	}
 
 }

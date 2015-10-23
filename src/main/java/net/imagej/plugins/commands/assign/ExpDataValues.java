@@ -37,7 +37,8 @@ import org.scijava.plugin.Attr;
 import org.scijava.plugin.Menu;
 import org.scijava.plugin.Plugin;
 
-import net.imagej.ops.math.RealMath.Exp;
+import net.imagej.ops.ComputerOp;
+import net.imagej.ops.Ops;
 import net.imglib2.type.numeric.RealType;
 import net.imglib2.type.numeric.real.DoubleType;
 
@@ -46,25 +47,24 @@ import net.imglib2.type.numeric.real.DoubleType;
  * 
  * @author Barry DeZonia
  */
-@Plugin(type = Command.class, menu = {
-	@Menu(label = MenuConstants.PROCESS_LABEL,
-		weight = MenuConstants.PROCESS_WEIGHT,
-		mnemonic = MenuConstants.PROCESS_MNEMONIC),
-	@Menu(label = "Math", mnemonic = 'm'), @Menu(label = "Exp...", weight = 14) },
-	headless = true, attrs = { @Attr(name = "no-legacy") })
+@Plugin(type = Command.class, menu = { @Menu(
+	label = MenuConstants.PROCESS_LABEL, weight = MenuConstants.PROCESS_WEIGHT,
+	mnemonic = MenuConstants.PROCESS_MNEMONIC), @Menu(label = "Math",
+		mnemonic = 'm'), @Menu(label = "Exp...", weight = 14) }, headless = true,
+	attrs = { @Attr(name = "no-legacy") })
 public class ExpDataValues<T extends RealType<T>> extends
 	MathCommand<T, DoubleType>
 {
 
 	// -- public interface --
-	
+
 	public ExpDataValues() {
 		super(new DoubleType());
 	}
 
 	@Override
-	public Exp<DoubleType, DoubleType> getOperation() {
-		return (Exp<DoubleType, DoubleType>) opService.computer(
-			Exp.class, DoubleType.class, DoubleType.class);
+	public ComputerOp<DoubleType, DoubleType> getOperation() {
+		return opService.computer(Ops.Math.Exp.class, DoubleType.class,
+			DoubleType.class);
 	}
 }

@@ -39,7 +39,8 @@ import org.scijava.plugin.Menu;
 import org.scijava.plugin.Parameter;
 import org.scijava.plugin.Plugin;
 
-import net.imagej.ops.math.RealMath.Reciprocal;
+import net.imagej.ops.ComputerOp;
+import net.imagej.ops.Ops;
 import net.imagej.options.OptionsMisc;
 import net.imglib2.type.numeric.RealType;
 import net.imglib2.type.numeric.real.DoubleType;
@@ -50,14 +51,13 @@ import net.imglib2.type.numeric.real.DoubleType;
  * 
  * @author Barry DeZonia
  */
-@Plugin(type = Command.class, menu = {
-	@Menu(label = MenuConstants.PROCESS_LABEL,
-		weight = MenuConstants.PROCESS_WEIGHT,
-		mnemonic = MenuConstants.PROCESS_MNEMONIC),
-	@Menu(label = "Math", mnemonic = 'm'),
-	@Menu(label = "Reciprocal...", weight = 17) }, headless = true, attrs = { @Attr(name = "no-legacy") })
-public class ReciprocalDataValues<T extends RealType<T>>
-	extends MathCommand<T, DoubleType>
+@Plugin(type = Command.class, menu = { @Menu(
+	label = MenuConstants.PROCESS_LABEL, weight = MenuConstants.PROCESS_WEIGHT,
+	mnemonic = MenuConstants.PROCESS_MNEMONIC), @Menu(label = "Math",
+		mnemonic = 'm'), @Menu(label = "Reciprocal...", weight = 17) },
+	headless = true, attrs = { @Attr(name = "no-legacy") })
+public class ReciprocalDataValues<T extends RealType<T>> extends
+	MathCommand<T, DoubleType>
 {
 	// -- instance variables that are Parameters --
 
@@ -65,15 +65,15 @@ public class ReciprocalDataValues<T extends RealType<T>>
 	private OptionsService optionsService;
 
 	// -- public interface --
-	
+
 	public ReciprocalDataValues() {
 		super(new DoubleType());
 	}
 
 	@Override
-	public Reciprocal<DoubleType, DoubleType> getOperation() {		
-		final OptionsMisc optionsMisc =
-				optionsService.getOptions(OptionsMisc.class);
+	public ComputerOp<DoubleType, DoubleType> getOperation() {
+		final OptionsMisc optionsMisc = optionsService.getOptions(
+			OptionsMisc.class);
 		final String dbzString = optionsMisc.getDivByZeroVal();
 		double dbzVal;
 		try {
@@ -82,8 +82,8 @@ public class ReciprocalDataValues<T extends RealType<T>>
 		catch (final NumberFormatException e) {
 			dbzVal = Double.POSITIVE_INFINITY;
 		}
-		return (Reciprocal<DoubleType, DoubleType>) opService.computer(
-			Reciprocal.class, DoubleType.class, DoubleType.class, dbzVal);
+		return opService.computer(Ops.Math.Reciprocal.class, DoubleType.class,
+			DoubleType.class, dbzVal);
 	}
 
 }

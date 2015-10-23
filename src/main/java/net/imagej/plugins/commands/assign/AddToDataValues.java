@@ -38,7 +38,8 @@ import org.scijava.plugin.Menu;
 import org.scijava.plugin.Parameter;
 import org.scijava.plugin.Plugin;
 
-import net.imagej.ops.math.RealMath.Add;
+import net.imagej.ops.ComputerOp;
+import net.imagej.ops.Ops;
 import net.imglib2.type.numeric.RealType;
 import net.imglib2.type.numeric.real.DoubleType;
 
@@ -48,20 +49,17 @@ import net.imglib2.type.numeric.real.DoubleType;
  * 
  * @author Barry DeZonia
  */
-@Plugin(
-	type = Command.class,
-	iconPath = "/icons/commands/sum.png",
-	menu = {
-		@Menu(label = MenuConstants.PROCESS_LABEL,
-			weight = MenuConstants.PROCESS_WEIGHT,
-			mnemonic = MenuConstants.PROCESS_MNEMONIC),
-		@Menu(label = "Math", mnemonic = 'm'), @Menu(label = "Add...", weight = 1) },
-	headless = true, attrs = { @Attr(name = "no-legacy") })
-public class AddToDataValues<T extends RealType<T>>
-	extends MathCommand<T,DoubleType>
+@Plugin(type = Command.class, iconPath = "/icons/commands/sum.png", menu = {
+	@Menu(label = MenuConstants.PROCESS_LABEL,
+		weight = MenuConstants.PROCESS_WEIGHT,
+		mnemonic = MenuConstants.PROCESS_MNEMONIC), @Menu(label = "Math",
+			mnemonic = 'm'), @Menu(label = "Add...", weight = 1) }, headless = true,
+	attrs = { @Attr(name = "no-legacy") })
+public class AddToDataValues<T extends RealType<T>> extends
+	MathCommand<T, DoubleType>
 {
 	// -- Parameters --
-	
+
 	@Parameter(label = "Value")
 	private double value;
 
@@ -80,10 +78,10 @@ public class AddToDataValues<T extends RealType<T>>
 	}
 
 	// -- private helpers --
-	
+
 	@Override
-	public Add<DoubleType,DoubleType> getOperation() {
-		return (Add<DoubleType, DoubleType>) opService.computer(
-			Add.class, DoubleType.class, DoubleType.class, value);
+	public ComputerOp<DoubleType, DoubleType> getOperation() {
+		return opService.computer(Ops.Math.Add.class, DoubleType.class,
+			DoubleType.class, value);
 	}
 }

@@ -39,7 +39,8 @@ import org.scijava.plugin.Menu;
 import org.scijava.plugin.Parameter;
 import org.scijava.plugin.Plugin;
 
-import net.imagej.ops.math.RealMath.Divide;
+import net.imagej.ops.ComputerOp;
+import net.imagej.ops.Ops;
 import net.imagej.options.OptionsMisc;
 import net.imglib2.type.numeric.RealType;
 import net.imglib2.type.numeric.real.DoubleType;
@@ -50,14 +51,13 @@ import net.imglib2.type.numeric.real.DoubleType;
  * 
  * @author Barry DeZonia
  */
-@Plugin(type = Command.class, menu = {
-	@Menu(label = MenuConstants.PROCESS_LABEL,
-		weight = MenuConstants.PROCESS_WEIGHT,
-		mnemonic = MenuConstants.PROCESS_MNEMONIC),
-	@Menu(label = "Math", mnemonic = 'm'),
-	@Menu(label = "Divide...", weight = 4) }, headless = true, attrs = { @Attr(name = "no-legacy") })
-public class DivideDataValuesBy<T extends RealType<T>>
-	extends MathCommand<T,DoubleType>
+@Plugin(type = Command.class, menu = { @Menu(
+	label = MenuConstants.PROCESS_LABEL, weight = MenuConstants.PROCESS_WEIGHT,
+	mnemonic = MenuConstants.PROCESS_MNEMONIC), @Menu(label = "Math",
+		mnemonic = 'm'), @Menu(label = "Divide...", weight = 4) }, headless = true,
+	attrs = { @Attr(name = "no-legacy") })
+public class DivideDataValuesBy<T extends RealType<T>> extends
+	MathCommand<T, DoubleType>
 {
 
 	// -- instance variables that are Parameters --
@@ -75,9 +75,9 @@ public class DivideDataValuesBy<T extends RealType<T>>
 	}
 
 	@Override
-	public Divide<DoubleType, DoubleType> getOperation() {
-		final OptionsMisc optionsMisc =
-			optionsService.getOptions(OptionsMisc.class);
+	public ComputerOp<DoubleType, DoubleType> getOperation() {
+		final OptionsMisc optionsMisc = optionsService.getOptions(
+			OptionsMisc.class);
 		final String dbzString = optionsMisc.getDivByZeroVal();
 		double dbzVal;
 		try {
@@ -86,8 +86,8 @@ public class DivideDataValuesBy<T extends RealType<T>>
 		catch (final NumberFormatException e) {
 			dbzVal = Double.POSITIVE_INFINITY;
 		}
-		return (Divide<DoubleType, DoubleType>) opService.computer(
-			Divide.class, DoubleType.class, DoubleType.class, value, dbzVal);
+		return opService.computer(Ops.Math.Divide.class, DoubleType.class,
+			DoubleType.class, value, dbzVal);
 	}
 
 	public double getValue() {

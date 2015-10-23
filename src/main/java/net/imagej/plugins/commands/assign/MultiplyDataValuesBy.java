@@ -38,7 +38,8 @@ import org.scijava.plugin.Menu;
 import org.scijava.plugin.Parameter;
 import org.scijava.plugin.Plugin;
 
-import net.imagej.ops.math.RealMath.Multiply;
+import net.imagej.ops.ComputerOp;
+import net.imagej.ops.Ops;
 import net.imglib2.type.numeric.RealType;
 import net.imglib2.type.numeric.real.DoubleType;
 
@@ -70,9 +71,9 @@ public class MultiplyDataValuesBy<T extends RealType<T>>
 	}
 
 	@Override
-	public Multiply<DoubleType, DoubleType> getOperation() {
-		return (Multiply<DoubleType, DoubleType>) opService.computer(
-			Multiply.class, DoubleType.class, DoubleType.class, value);
+	public ComputerOp<DoubleType, DoubleType> getOperation() {
+		return opService.computer(
+			Ops.Math.Multiply.class, DoubleType.class, DoubleType.class, value);
 	}
 
 	public double getValue() {

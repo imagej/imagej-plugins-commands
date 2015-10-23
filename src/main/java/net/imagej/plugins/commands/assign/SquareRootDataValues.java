@@ -37,7 +37,8 @@ import org.scijava.plugin.Attr;
 import org.scijava.plugin.Menu;
 import org.scijava.plugin.Plugin;
 
-import net.imagej.ops.math.RealMath.Sqrt;
+import net.imagej.ops.ComputerOp;
+import net.imagej.ops.Ops;
 import net.imglib2.type.numeric.RealType;
 import net.imglib2.type.numeric.real.DoubleType;
 
@@ -47,25 +48,24 @@ import net.imglib2.type.numeric.real.DoubleType;
  * 
  * @author Barry DeZonia
  */
-@Plugin(type = Command.class, menu = {
-	@Menu(label = MenuConstants.PROCESS_LABEL,
-		weight = MenuConstants.PROCESS_WEIGHT,
-		mnemonic = MenuConstants.PROCESS_MNEMONIC),
-	@Menu(label = "Math", mnemonic = 'm'),
-	@Menu(label = "Square Root...", weight = 16) }, headless = true, attrs = { @Attr(name = "no-legacy") })
-public class SquareRootDataValues<T extends RealType<T>>
-	extends MathCommand<T, DoubleType>
+@Plugin(type = Command.class, menu = { @Menu(
+	label = MenuConstants.PROCESS_LABEL, weight = MenuConstants.PROCESS_WEIGHT,
+	mnemonic = MenuConstants.PROCESS_MNEMONIC), @Menu(label = "Math",
+		mnemonic = 'm'), @Menu(label = "Square Root...", weight = 16) },
+	headless = true, attrs = { @Attr(name = "no-legacy") })
+public class SquareRootDataValues<T extends RealType<T>> extends
+	MathCommand<T, DoubleType>
 {
 	// -- public interface --
 
 	public SquareRootDataValues() {
 		super(new DoubleType());
 	}
-	
+
 	@Override
-	public Sqrt<DoubleType, DoubleType> getOperation() {
-		return (Sqrt<DoubleType, DoubleType>) opService.computer(
-			Sqrt.class, DoubleType.class, DoubleType.class);
+	public ComputerOp<DoubleType, DoubleType> getOperation() {
+		return opService.computer(Ops.Math.Sqrt.class, DoubleType.class,
+			DoubleType.class);
 	}
 
 }
