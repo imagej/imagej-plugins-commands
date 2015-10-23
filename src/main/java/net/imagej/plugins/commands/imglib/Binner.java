@@ -34,26 +34,6 @@ package net.imagej.plugins.commands.imglib;
 import java.util.ArrayList;
 import java.util.List;
 
-import net.imagej.Dataset;
-import net.imagej.DatasetService;
-import net.imagej.axis.AxisType;
-import net.imglib2.Cursor;
-import net.imglib2.RandomAccessibleInterval;
-import net.imglib2.img.Img;
-import net.imglib2.img.cell.AbstractCellImg;
-import net.imglib2.ops.function.Function;
-import net.imglib2.ops.function.real.RealArithmeticMeanFunction;
-import net.imglib2.ops.function.real.RealImageFunction;
-import net.imglib2.ops.function.real.RealMaxFunction;
-import net.imglib2.ops.function.real.RealMedianFunction;
-import net.imglib2.ops.function.real.RealMinFunction;
-import net.imglib2.ops.function.real.RealSumFunction;
-import net.imglib2.ops.pointset.HyperVolumePointSet;
-import net.imglib2.ops.pointset.PointSet;
-import net.imglib2.outofbounds.OutOfBoundsMirrorFactory;
-import net.imglib2.outofbounds.OutOfBoundsMirrorFactory.Boundary;
-import net.imglib2.type.numeric.RealType;
-
 import org.scijava.ItemIO;
 import org.scijava.command.Command;
 import org.scijava.command.ContextCommand;
@@ -62,6 +42,23 @@ import org.scijava.plugin.Attr;
 import org.scijava.plugin.Menu;
 import org.scijava.plugin.Parameter;
 import org.scijava.plugin.Plugin;
+
+import net.imagej.Dataset;
+import net.imagej.DatasetService;
+import net.imagej.axis.AxisType;
+import net.imagej.ops.ComputerOp;
+import net.imagej.ops.Op;
+import net.imagej.ops.OpService;
+import net.imagej.ops.Ops;
+import net.imglib2.Cursor;
+import net.imglib2.RandomAccess;
+import net.imglib2.RandomAccessible;
+import net.imglib2.algorithm.neighborhood.CenteredRectangleShape;
+import net.imglib2.algorithm.neighborhood.Neighborhood;
+import net.imglib2.algorithm.neighborhood.Shape;
+import net.imglib2.img.Img;
+import net.imglib2.img.cell.AbstractCellImg;
+import net.imglib2.type.numeric.RealType;
 
 /**
  * Reduces the size of an image by integral scale factors. The scale factors can
@@ -73,9 +70,9 @@ import org.scijava.plugin.Plugin;
  */
 @Plugin(type = Command.class, initializer = "init", headless = true, menu = {
 	@Menu(label = MenuConstants.IMAGE_LABEL, weight = MenuConstants.IMAGE_WEIGHT,
-			mnemonic = MenuConstants.IMAGE_MNEMONIC),
-		@Menu(label = "Transform", mnemonic = 't'),
-	@Menu(label = "Bin...", mnemonic = 'b') }, attrs = { @Attr(name = "no-legacy") })
+		mnemonic = MenuConstants.IMAGE_MNEMONIC), @Menu(label = "Transform",
+			mnemonic = 't'), @Menu(label = "Bin...", mnemonic = 'b') }, attrs = {
+				@Attr(name = "no-legacy") })
 public class Binner<T extends RealType<T>> extends ContextCommand {
 
 	// -- constants --
@@ -97,12 +94,15 @@ public class Binner<T extends RealType<T>> extends ContextCommand {
 	// TODO - autodiscover OPS functions like mean, harmonic mean, etc. and use
 	// them. For now just copy IJ1's capabilities.
 
-	@Parameter(label = "Value method",
-		choices = { AVERAGE, SUM, MIN, MAX, MEDIAN })
+	@Parameter(label = "Value method", choices = { AVERAGE, SUM, MIN, MAX,
+		MEDIAN })
 	private String method = AVERAGE;
 
 	@Parameter
 	private DatasetService datasetService;
+
+	@Parameter
+	private OpService ops;
 
 	// -- non-parameter fields --
 
@@ -199,7 +199,7 @@ public class Binner<T extends RealType<T>> extends ContextCommand {
 	}
 
 	// -- initializers --
-	
+
 	protected void init() {
 		factors.clear();
 		for (int i = 0; i < dataset.numDimensions(); i++) {
@@ -207,7 +207,7 @@ public class Binner<T extends RealType<T>> extends ContextCommand {
 		}
 		dimFactors = factorsString();
 	}
-	
+
 	// -- helpers --
 
 	private List<Integer> parseReductions(Dataset ds, String spec) {
@@ -228,9 +228,8 @@ public class Binner<T extends RealType<T>> extends ContextCommand {
 			String term = terms[i].trim();
 			String[] parts = term.split("=");
 			if (parts.length != 2) {
-				err =
-					"Err in dimension reduction specification string: each"
-						+ " dimension must be two numbers separated by an '=' sign.";
+				err = "Err in dimension reduction specification string: each" +
+					" dimension must be two numbers separated by an '=' sign.";
 				return null;
 			}
 			int axisIndex;
@@ -240,9 +239,8 @@ public class Binner<T extends RealType<T>> extends ContextCommand {
 				factor = Integer.parseInt(parts[1].trim());
 			}
 			catch (NumberFormatException e) {
-				err =
-					"Err in dimension reduction specification string: each"
-						+ " dimension must be two numbers separated by an '=' sign.";
+				err = "Err in dimension reduction specification string: each" +
+					" dimension must be two numbers separated by an '=' sign.";
 				return null;
 			}
 			if (axisIndex < 0 || axisIndex >= ds.numDimensions()) {
@@ -250,9 +248,8 @@ public class Binner<T extends RealType<T>> extends ContextCommand {
 				return null;
 			}
 			if (factor < 1 || factor > ds.dimension(axisIndex)) {
-				err =
-					"Reduction factor " + i + " must be between 1 and " +
-						ds.dimension(axisIndex) + ".";
+				err = "Reduction factor " + i + " must be between 1 and " + ds
+					.dimension(axisIndex) + ".";
 				return null;
 			}
 			reductions.set(axisIndex, factor);
@@ -262,33 +259,43 @@ public class Binner<T extends RealType<T>> extends ContextCommand {
 
 	private void reduceData(Dataset ds, List<Integer> reductionFactors) {
 
-		// make the correct Function from the dataset based upon valueMethod.
-		Function<PointSet, T> func = function(ds);
-
-		// setup neighborhood to calc from
-		PointSet neigh = neighborhood(reductionFactors);
-
 		// make new dimensioned data
 		Dataset newDs = newData(ds, reductionFactors);
 
+		@SuppressWarnings("unchecked")
+		Img<T> img = (Img<T>) ds.getImgPlus();
+
+		// setup neighborhood to calc from
+		int[] span = new int[reductionFactors.size()];
+		for (int i = 0; i < reductionFactors.size(); i++) {
+			span[i] = reductionFactors.get(i) / 2;
+		}
+		Shape neigh = new CenteredRectangleShape(span, false);
+		RandomAccessible<Neighborhood<T>> neighborhoods = neigh
+			.neighborhoodsRandomAccessible(img);
+		
+		// get the corresponding ComputerOp to the value method string
+		ComputerOp<Neighborhood<T>, T> valueMethod = computer(neighborhoods
+			.randomAccess().get(), img.firstElement());
+
 		// walk each pixel in new dimension, find neighborhood of related point in
 		// original space, calc value, and set in newDs.
-		long[] currPos = new long[newDs.numDimensions()];
-		long[] lastPos = new long[newDs.numDimensions()];
-		long[] translation = new long[ds.numDimensions()];
+		// TODO: might be able to use Ops.Map to do this in parallel
+		long[] newImgPos = new long[newDs.numDimensions()];
+		long[] neighsPos = new long[neighborhoods.numDimensions()];
 		@SuppressWarnings("unchecked")
-		Cursor<T> cursor = (Cursor<T>) newDs.getImgPlus().localizingCursor();
-		T var = cursor.get().createVariable();
-		while (cursor.hasNext()) {
-			cursor.next();
-			cursor.localize(currPos);
-			findTranslation(lastPos, currPos, reductionFactors, translation);
-			for (int i = 0; i < lastPos.length; i++) {
-				lastPos[i] = currPos[i];
+		Cursor<T> newImgCur = (Cursor<T>) newDs.getImgPlus().localizingCursor();
+		RandomAccess<Neighborhood<T>> neighsRA = neighborhoods.randomAccess();
+		T var = newImgCur.get().createVariable();
+		while (newImgCur.hasNext()) {
+			newImgCur.next();
+			newImgCur.localize(newImgPos);
+			for (int i = 0; i < newImgPos.length; i++) {
+				neighsPos[i] = newImgPos[i] * reductionFactors.get(i);
 			}
-			neigh.translate(translation);
-			func.compute(neigh, var);
-			cursor.get().set(var);
+			neighsRA.localize(neighsPos);
+			valueMethod.compute(neighsRA.get(), var);
+			newImgCur.get().set(var);
 		}
 
 		// TODO
@@ -313,26 +320,16 @@ public class Binner<T extends RealType<T>> extends ContextCommand {
 		return str;
 	}
 
-	private Function<PointSet, T> function(Dataset ds) {
-		@SuppressWarnings("unchecked")
-		Img<T> img = (Img<T>) ds.getImgPlus();
-		OutOfBoundsMirrorFactory<T, RandomAccessibleInterval<T>> oobFactory =
-			new OutOfBoundsMirrorFactory<T, RandomAccessibleInterval<T>>(
-				Boundary.DOUBLE);
-		T var = img.firstElement();
-		Function<long[], T> imgFunc =
-			new RealImageFunction<T, T>(img, oobFactory, var);
-		if (method == AVERAGE) return new RealArithmeticMeanFunction<T>(imgFunc);
-		else if (method == MAX) return new RealMaxFunction<T>(imgFunc);
-		else if (method == MEDIAN) return new RealMedianFunction<T>(imgFunc);
-		else if (method == MIN) return new RealMinFunction<T>(imgFunc);
-		else if (method == SUM) return new RealSumFunction<T>(imgFunc);
+	private ComputerOp<Neighborhood<T>, T> computer(Neighborhood<T> neigh,
+		T type)
+	{
+		Class<? extends Op> opClass;
+		if (method == AVERAGE) opClass = Ops.Stats.Mean.class;
+		else if (method == MAX) opClass = Ops.Stats.Max.class;
+		else if (method == MEDIAN) opClass = Ops.Stats.Median.class;
+		else if (method == SUM) opClass = Ops.Stats.Sum.class;
 		else throw new IllegalArgumentException("unknown method: " + method);
-	}
-
-	private PointSet neighborhood(List<Integer> reductionFactors) {
-		long[] dims = neighSize(reductionFactors);
-		return new HyperVolumePointSet(dims);
+		return ops.computer(opClass, type, neigh);
 	}
 
 	private Dataset newData(Dataset origDs, List<Integer> reductionFactors) {
@@ -345,28 +342,10 @@ public class Binner<T extends RealType<T>> extends ContextCommand {
 		int bitsPerPixel = origDs.getImgPlus().firstElement().getBitsPerPixel();
 		boolean signed = origDs.isSigned();
 		boolean floating = !origDs.isInteger();
-		boolean virtual =
-			AbstractCellImg.class.isAssignableFrom(origDs.getImgPlus().getImg()
-				.getClass());
-		return datasetService.create(newDims, name, axisTypes, bitsPerPixel,
-			signed, floating, virtual);
-	}
-
-	private void findTranslation(long[] newDsLastPos, long[] newDsCurrPos,
-		List<Integer> reductionFactors, long[] origDsTranslation)
-	{
-		for (int i = 0; i < origDsTranslation.length; i++) {
-			origDsTranslation[i] = newDsCurrPos[i] - newDsLastPos[i];
-			origDsTranslation[i] *= reductionFactors.get(i);
-		}
-	}
-
-	private long[] neighSize(List<Integer> reductionFactors) {
-		long[] neighSize = new long[reductionFactors.size()];
-		for (int i = 0; i < neighSize.length; i++) {
-			neighSize[i] = reductionFactors.get(i);
-		}
-		return neighSize;
+		boolean virtual = AbstractCellImg.class.isAssignableFrom(origDs.getImgPlus()
+			.getImg().getClass());
+		return datasetService.create(newDims, name, axisTypes, bitsPerPixel, signed,
+			floating, virtual);
 	}
 
 	private long[] newDims(Dataset ds, List<Integer> reductionFactors) {
