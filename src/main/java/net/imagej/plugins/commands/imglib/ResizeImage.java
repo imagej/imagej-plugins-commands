@@ -34,17 +34,6 @@ package net.imagej.plugins.commands.imglib;
 import java.util.ArrayList;
 import java.util.List;
 
-import net.imagej.Dataset;
-import net.imagej.DatasetService;
-import net.imagej.ImgPlus;
-import net.imagej.axis.Axes;
-import net.imagej.axis.AxisType;
-import net.imagej.axis.CalibratedAxis;
-import net.imglib2.img.Img;
-import net.imglib2.img.cell.AbstractCellImg;
-import net.imglib2.ops.operation.iterableinterval.unary.Resample;
-import net.imglib2.type.numeric.RealType;
-
 import org.scijava.ItemIO;
 import org.scijava.command.Command;
 import org.scijava.command.ContextCommand;
@@ -53,6 +42,25 @@ import org.scijava.plugin.Attr;
 import org.scijava.plugin.Menu;
 import org.scijava.plugin.Parameter;
 import org.scijava.plugin.Plugin;
+
+import net.imagej.Dataset;
+import net.imagej.DatasetService;
+import net.imagej.ImgPlus;
+import net.imagej.axis.Axes;
+import net.imagej.axis.AxisType;
+import net.imagej.axis.CalibratedAxis;
+import net.imagej.ops.OpService;
+import net.imagej.ops.Ops;
+import net.imglib2.Cursor;
+import net.imglib2.RandomAccess;
+import net.imglib2.RandomAccessible;
+import net.imglib2.img.cell.AbstractCellImg;
+import net.imglib2.interpolation.InterpolatorFactory;
+import net.imglib2.interpolation.randomaccess.LanczosInterpolatorFactory;
+import net.imglib2.interpolation.randomaccess.NLinearInterpolatorFactory;
+import net.imglib2.interpolation.randomaccess.NearestNeighborInterpolatorFactory;
+import net.imglib2.type.numeric.RealType;
+import net.imglib2.view.Views;
 
 /**
  * Resamples an existing image into a Dataset of specified dimensions. The
@@ -64,9 +72,9 @@ import org.scijava.plugin.Plugin;
  */
 @Plugin(type = Command.class, initializer = "init", headless = true, menu = {
 	@Menu(label = MenuConstants.IMAGE_LABEL, weight = MenuConstants.IMAGE_WEIGHT,
-		mnemonic = MenuConstants.IMAGE_MNEMONIC),
-	@Menu(label = "Adjust", mnemonic = 'a'),
-	@Menu(label = "Resize...", mnemonic = 'r') }, attrs = { @Attr(name = "no-legacy") })
+		mnemonic = MenuConstants.IMAGE_MNEMONIC), @Menu(label = "Adjust",
+			mnemonic = 'a'), @Menu(label = "Resize...", mnemonic = 'r') }, attrs = {
+				@Attr(name = "no-legacy") })
 public class ResizeImage<T extends RealType<T>> extends ContextCommand {
 
 	// -- constants --
@@ -94,6 +102,8 @@ public class ResizeImage<T extends RealType<T>> extends ContextCommand {
 	@Parameter
 	private DatasetService datasetService;
 
+	@Parameter
+	private OpService ops;
 
 	// -- non-parameter fields --
 
@@ -255,9 +265,8 @@ public class ResizeImage<T extends RealType<T>> extends ContextCommand {
 			String term = terms[i].trim();
 			String[] parts = term.split("=");
 			if (parts.length != 2) {
-				err =
-					"Err in dimension specification string: each"
-						+ " dimension must be two numbers separated by an '=' sign.";
+				err = "Err in dimension specification string: each" +
+					" dimension must be two numbers separated by an '=' sign.";
 				return null;
 			}
 			int axisIndex;
@@ -267,9 +276,8 @@ public class ResizeImage<T extends RealType<T>> extends ContextCommand {
 				size = Long.parseLong(parts[1].trim());
 			}
 			catch (NumberFormatException e) {
-				err =
-					"Err in dimension specification string: each"
-						+ " dimension must be two numbers separated by an '=' sign.";
+				err = "Err in dimension specification string: each" +
+					" dimension must be two numbers separated by an '=' sign.";
 				return null;
 			}
 			if (axisIndex < 0 || axisIndex >= ds.numDimensions()) {
@@ -309,7 +317,9 @@ public class ResizeImage<T extends RealType<T>> extends ContextCommand {
 
 	private void resampleData(Dataset ds, List<Long> dims) {
 
-		ImgPlus<? extends RealType<?>> origImgPlus = ds.getImgPlus();
+		@SuppressWarnings("unchecked")
+		ImgPlus<T> origImgPlus = (ImgPlus<T>) ds.getImgPlus();
+
 		int numDims = origImgPlus.numDimensions();
 		CalibratedAxis[] axes = new CalibratedAxis[numDims];
 		ds.axes(axes);
@@ -318,12 +328,40 @@ public class ResizeImage<T extends RealType<T>> extends ContextCommand {
 			axisTypes[i] = axes[i].type();
 		}
 		Dataset newDs = newData(ds, dims);
+
+		@SuppressWarnings("unchecked")
+		ImgPlus<T> newImgPlus = (ImgPlus<T>) ds.getImgPlus();
+
 		newDs.setAxes(axes);
 		if (ds.getCompositeChannelCount() == numChannels(ds)) {
 			newDs.setCompositeChannelCount(numChannels(newDs));
 		}
-		Resample<T> resampleOp = new Resample<T>(resampleMode());
-		resampleOp.compute((Img<T>) origImgPlus, (Img<T>) newDs.getImgPlus());
+
+		InterpolatorFactory<T, RandomAccessible<T>> ifac;
+		if (method.equals(LANCZOS)) ifac = new LanczosInterpolatorFactory<T>();
+		else if (method.equals(LINEAR)) ifac = new NLinearInterpolatorFactory<T>();
+		else if (method.equals(NEAREST_NEIGHBOR)) ifac =
+			new NearestNeighborInterpolatorFactory<T>();
+		else if (method.equals(PERIODICAL)) {
+			RandomAccess<T> origRA = Views.extendPeriodic(origImgPlus).randomAccess();
+			Cursor<T> newCur = Views.iterable(newImgPlus).localizingCursor();
+			while (newCur.hasNext()) {
+				newCur.fwd();
+				origRA.setPosition(newCur);
+				newCur.get().set(origRA.get());
+			}
+			ds.setImgPlus(newImgPlus);
+			return;
+		}
+		else throw new IllegalArgumentException("Unknown interpolation method: " +
+			method);
+
+		double[] scaleFactors = new double[dims.size()];
+		for (int i = 0; i < dims.size(); i++) {
+			scaleFactors[i] = (double) dims.get(i) / origImgPlus.dimension(i);
+		}
+		ops.run(Ops.Image.Scale.class, origImgPlus, scaleFactors, ifac, newDs
+			.getImgPlus());
 		ds.setImgPlus(newDs.getImgPlus());
 	}
 
@@ -348,11 +386,10 @@ public class ResizeImage<T extends RealType<T>> extends ContextCommand {
 		int bitsPerPixel = origDs.getImgPlus().firstElement().getBitsPerPixel();
 		boolean signed = origDs.isSigned();
 		boolean floating = !origDs.isInteger();
-		boolean virtual =
-			AbstractCellImg.class.isAssignableFrom(origDs.getImgPlus().getImg()
-				.getClass());
-		return datasetService.create(newDims, name, axisTypes, bitsPerPixel,
-			signed, floating, virtual);
+		boolean virtual = AbstractCellImg.class.isAssignableFrom(origDs.getImgPlus()
+			.getImg().getClass());
+		return datasetService.create(newDims, name, axisTypes, bitsPerPixel, signed,
+			floating, virtual);
 	}
 
 	private long[] newDims(Dataset ds, List<Long> dimsList) {
@@ -361,15 +398,6 @@ public class ResizeImage<T extends RealType<T>> extends ContextCommand {
 			dims[i] = dimsList.get(i);
 		}
 		return dims;
-	}
-
-	private Resample.Mode resampleMode() {
-		if (method.equals(LANCZOS)) return Resample.Mode.LANCZOS;
-		else if (method.equals(LINEAR)) return Resample.Mode.LINEAR;
-		else if (method.equals(NEAREST_NEIGHBOR)) return Resample.Mode.NEAREST_NEIGHBOR;
-		else if (method.equals(PERIODICAL)) return Resample.Mode.PERIODICAL;
-		else throw new IllegalArgumentException("Unknown interpolation method: " +
-			method);
 	}
 
 	private int numChannels(Dataset ds) {
