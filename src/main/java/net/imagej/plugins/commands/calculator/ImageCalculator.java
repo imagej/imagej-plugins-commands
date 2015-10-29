@@ -31,18 +31,6 @@
 
 package net.imagej.plugins.commands.calculator;
 
-import net.imagej.Dataset;
-import net.imagej.DatasetService;
-import net.imagej.operator.CalculatorOp;
-import net.imagej.operator.CalculatorService;
-import net.imagej.space.SpaceUtils;
-import net.imglib2.RandomAccess;
-import net.imglib2.img.Img;
-import net.imglib2.ops.pointset.HyperVolumePointSet;
-import net.imglib2.ops.pointset.PointSetIterator;
-import net.imglib2.type.numeric.RealType;
-import net.imglib2.type.numeric.real.DoubleType;
-
 import org.scijava.ItemIO;
 import org.scijava.command.Command;
 import org.scijava.command.ContextCommand;
@@ -52,6 +40,21 @@ import org.scijava.plugin.Menu;
 import org.scijava.plugin.Parameter;
 import org.scijava.plugin.Plugin;
 
+import net.imagej.Dataset;
+import net.imagej.DatasetService;
+import net.imagej.ImgPlus;
+import net.imagej.ops.ComputerOp;
+import net.imagej.ops.OpService;
+import net.imagej.ops.Ops;
+import net.imagej.space.SpaceUtils;
+import net.imglib2.Interval;
+import net.imglib2.RandomAccessibleInterval;
+import net.imglib2.img.Img;
+import net.imglib2.type.numeric.RealType;
+import net.imglib2.type.numeric.real.DoubleType;
+import net.imglib2.util.Intervals;
+import net.imglib2.view.Views;
+
 /**
  * Fills an output Dataset with a combination of two input Datasets. The
  * combination is specified by the user (such as Add, Min, Average, etc.).
@@ -60,11 +63,11 @@ import org.scijava.plugin.Plugin;
  * @author Curtis Rueden
  */
 @Plugin(type = Command.class, iconPath = "/icons/commands/calculator.png",
-	menu = {
-		@Menu(label = MenuConstants.PROCESS_LABEL,
-			weight = MenuConstants.PROCESS_WEIGHT,
-			mnemonic = MenuConstants.PROCESS_MNEMONIC),
-		@Menu(label = "Image Calculator...", weight = 22) }, headless = true, attrs = { @Attr(name = "no-legacy") })
+	menu = { @Menu(label = MenuConstants.PROCESS_LABEL,
+		weight = MenuConstants.PROCESS_WEIGHT,
+		mnemonic = MenuConstants.PROCESS_MNEMONIC), @Menu(
+			label = "Image Calculator...", weight = 22) }, headless = true, attrs = {
+				@Attr(name = "no-legacy") })
 public class ImageCalculator<U extends RealType<U>, V extends RealType<V>>
 	extends ContextCommand
 {
@@ -72,10 +75,10 @@ public class ImageCalculator<U extends RealType<U>, V extends RealType<V>>
 	// -- instance variables that are Parameters --
 
 	@Parameter
-	private CalculatorService calculatorService;
+	private DatasetService datasetService;
 
 	@Parameter
-	private DatasetService datasetService;
+	private OpService opService;
 
 	@Parameter(type = ItemIO.BOTH)
 	private Dataset input1;
@@ -87,7 +90,7 @@ public class ImageCalculator<U extends RealType<U>, V extends RealType<V>>
 	private Dataset output;
 
 	@Parameter(label = "Operation to do between the two input images")
-	private CalculatorOp<U, V> op;
+	private ComputerOp<U, V> op;
 
 	@Parameter(label = "Create new window")
 	private boolean newWindow = true;
@@ -101,26 +104,44 @@ public class ImageCalculator<U extends RealType<U>, V extends RealType<V>>
 	 * Runs the plugin filling the output image with the user specified binary
 	 * combination of the two input images.
 	 */
-	@Override
 	@SuppressWarnings("unchecked")
+	@Override
 	public void run() {
-		Img<DoubleType> img = null;
+		final ImgPlus<U> img1 = (ImgPlus<U>) input1.getImgPlus();
+		final ImgPlus<V> img2 = (ImgPlus<V>) input2.getImgPlus();
+		final int n = img1.numDimensions();
+		if (n != img1.numDimensions()) {
+			throw new IllegalArgumentException(
+				"The dimensions of the two images do not match.");
+		}
+		final long[] min1 = new long[n];
+		final long[] min2 = new long[n];
+		img1.min(min1);
+		img2.min(min2);
+		final RandomAccessibleInterval<U> offsetImg1 = Views.offset(img1, min1);
+		final RandomAccessibleInterval<V> offsetImg2 = Views.offset(img2, min2);
+		final Interval intersect = Intervals.intersect(offsetImg1, offsetImg2);
+		final RandomAccessibleInterval<U> img1Sub = opService.image().crop(
+			offsetImg1, intersect);
+		final RandomAccessibleInterval<V> img2Sub = opService.image().crop(
+			offsetImg2, intersect);
+		Img<DoubleType> img = opService.create().<DoubleType> img(intersect);
+
 		try {
-			final Img<U> img1 = (Img<U>) input1.getImgPlus();
-			final Img<V> img2 = (Img<V>) input2.getImgPlus();
-			img = calculatorService.combine(img1, img2, op);
+			// TODO: need Ops between two images (not just add/div/mul/sub)
+			opService.map(img, img1Sub, img2Sub, op);
 		}
 		catch (final IllegalArgumentException e) {
 			cancel(e.toString());
 			return;
 		}
-		final long[] span = new long[img.numDimensions()];
-		img.dimensions(span);
 
 		// replace original data if desired by user
 		if (!wantDoubles && !newWindow) {
 			output = null;
-			copyDataInto(input1.getImgPlus(), img, span);
+			final ComputerOp<DoubleType, U> converter = opService.computer(
+				Ops.Convert.Copy.class, img1.firstElement(), img.firstElement());
+			opService.map(offsetImg1, img, converter);
 			input1.update();
 		}
 		else { // write into output
@@ -133,10 +154,13 @@ public class ImageCalculator<U extends RealType<U>, V extends RealType<V>>
 				signed = true;
 			}
 			// TODO : HACK - this next line works but always creates a PlanarImg
-			output =
-				datasetService.create(span, "Result of operation", SpaceUtils
-					.getAxisTypes(input1), bits, signed, floating);
-			copyDataInto(output.getImgPlus(), img, span);
+			final long[] span = new long[n];
+			img.dimensions(span);
+			output = datasetService.create(span, "Result of operation", SpaceUtils
+				.getAxisTypes(input1), bits, signed, floating);
+			final ComputerOp<DoubleType, U> converter = opService.computer(
+				Ops.Convert.Copy.class, img1.firstElement(), img.firstElement());
+			opService.map(output.getImgPlus(), img, converter);
 			output.update(); // TODO - probably unnecessary
 		}
 	}
@@ -177,18 +201,18 @@ public class ImageCalculator<U extends RealType<U>, V extends RealType<V>>
 	}
 
 	/**
-	 * Returns the {@link CalculatorOp} that was used in the image calculation.
+	 * Returns the {@link ComputerOp} that was used in the image calculation.
 	 */
-	public CalculatorOp<U, V> getOperation() {
+	public ComputerOp<U, V> getOperation() {
 		return op;
 	}
 
 	// TODO - due to generics is this too difficult to specify for real world use?
 
 	/**
-	 * Sets the {@link CalculatorOp} to be used in the image calculation.
+	 * Sets the {@link ComputerOp} to be used in the image calculation.
 	 */
-	public void setOperation(final CalculatorOp<U, V> operation) {
+	public void setOperation(final ComputerOp<U, V> operation) {
 		op = operation;
 	}
 
@@ -222,26 +246,6 @@ public class ImageCalculator<U extends RealType<U>, V extends RealType<V>>
 	 */
 	public void setDoubleOutput(final boolean wantDoubles) {
 		this.wantDoubles = wantDoubles;
-	}
-
-
-	// -- private helpers --
-
-	private void copyDataInto(final Img<? extends RealType<?>> out,
-		final Img<? extends RealType<?>> in, final long[] span)
-	{
-		final RandomAccess<? extends RealType<?>> src = in.randomAccess();
-		final RandomAccess<? extends RealType<?>> dst = out.randomAccess();
-		final HyperVolumePointSet ps = new HyperVolumePointSet(span);
-		final PointSetIterator iter = ps.iterator();
-		long[] pos = null;
-		while (iter.hasNext()) {
-			pos = iter.next();
-			src.setPosition(pos);
-			dst.setPosition(pos);
-			final double value = src.get().getRealDouble();
-			dst.get().setReal(value);
-		}
 	}
 
 }
