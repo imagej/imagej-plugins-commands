@@ -250,22 +250,22 @@ public class DeleteData extends DynamicCommand {
 	@SuppressWarnings("synthetic-access")
 	private class RemapAlgorithm implements ColorTableRemapper.RemapAlgorithm {
 
-		private final long[] origPlaneDims;
+		private final long[] srcPlaneDims;
 		private final long[] srcPlanePos;
 		private final int axisIndex;
 
 		public RemapAlgorithm(final long[] origDims, int axisIndex) {
-			this.origPlaneDims = new long[origDims.length - 2];
-			for (int i = 0; i < origPlaneDims.length; i++) {
-				origPlaneDims[i] = origDims[i + 2];
+			this.srcPlaneDims = new long[origDims.length - 2];
+			for (int i = 0; i < srcPlaneDims.length; i++) {
+				srcPlaneDims[i] = origDims[i + 2];
 			}
-			this.srcPlanePos = new long[origPlaneDims.length];
+			this.srcPlanePos = new long[srcPlaneDims.length];
 			this.axisIndex = axisIndex;
 		}
 
 		@Override
 		public boolean isValidSourcePlane(final long i) {
-			ColorTableRemapper.toND(origPlaneDims, i, srcPlanePos);
+			ColorTableRemapper.toND(srcPlaneDims, i, srcPlanePos);
 			if (srcPlanePos[axisIndex - 2] < position - 1) return true;
 			if (srcPlanePos[axisIndex - 2] >= position - 1 + quantity) return true;
 			return false;
