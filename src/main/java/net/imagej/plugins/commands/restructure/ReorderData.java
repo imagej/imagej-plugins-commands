@@ -39,9 +39,8 @@ import net.imagej.ImgPlus;
 import net.imagej.axis.Axes;
 import net.imagej.axis.AxisType;
 import net.imagej.space.SpaceUtils;
+import net.imglib2.Cursor;
 import net.imglib2.RandomAccess;
-import net.imglib2.ops.pointset.HyperVolumePointSet;
-import net.imglib2.ops.pointset.PointSetIterator;
 import net.imglib2.type.numeric.RealType;
 import net.imglib2.util.Intervals;
 
@@ -237,12 +236,9 @@ public class ReorderData extends DynamicCommand {
 	 * has them stored in a different axis order
 	 */
 	private ImgPlus<? extends RealType<?>> getReorganizedData() {
-		final RandomAccess<? extends RealType<?>> inputAccessor =
-			dataset.getImgPlus().randomAccess();
-		final long[] inputSpan = new long[dataset.getImgPlus().numDimensions()];
-		dataset.getImgPlus().dimensions(inputSpan);
-		final HyperVolumePointSet volume = new HyperVolumePointSet(inputSpan);
-		final PointSetIterator iter = volume.iterator();
+		final Cursor<? extends RealType<?>> inputCursor =
+			dataset.getImgPlus().cursor();
+		final int numDimensions = inputCursor.numDimensions();
 		final long[] origDims = Intervals.dimensionsAsLongArray(dataset);
 		final AxisType[] origAxes = SpaceUtils.getAxisTypes(dataset);
 		final long[] newDims = getNewDims(origDims);
@@ -252,12 +248,14 @@ public class ReorderData extends DynamicCommand {
 		newImgPlus.setCompositeChannelCount(dataset.getCompositeChannelCount());
 		final RandomAccess<? extends RealType<?>> outputAccessor =
 			newImgPlus.randomAccess();
-		final long[] permutedPos = new long[inputSpan.length];
-		long[] currPos;
-		while (iter.hasNext()) {
-			currPos = iter.next();
-			inputAccessor.setPosition(currPos);
-			final double value = inputAccessor.get().getRealDouble();
+		final long[] permutedPos = new long[numDimensions];
+		long[] currPos = new long[numDimensions];
+		// TODO: We might be able to figure out using map to do the permutation
+		// TODO: We might be able to use .get().set() to be less lossy
+		while (inputCursor.hasNext()) {
+			inputCursor.fwd();
+			inputCursor.localize(currPos);
+			final double value = inputCursor.get().getRealDouble();
 			permute(currPos, permutedPos);
 			outputAccessor.setPosition(permutedPos);
 			outputAccessor.get().setReal(value);
