@@ -46,15 +46,11 @@ import net.imagej.display.OverlayService;
 import net.imagej.ops.ComputerOp;
 import net.imagej.ops.OpService;
 import net.imagej.overlay.Overlay;
-import net.imglib2.RandomAccess;
-import net.imglib2.img.Img;
-import net.imglib2.img.array.ArrayImgFactory;
-import net.imglib2.ops.pointset.HyperVolumePointSet;
-import net.imglib2.ops.pointset.PointSet;
-import net.imglib2.ops.pointset.PointSetIterator;
+import net.imglib2.Interval;
+import net.imglib2.RandomAccessibleInterval;
 import net.imglib2.type.numeric.ComplexType;
-import net.imglib2.type.numeric.RealType;
-import net.imglib2.type.numeric.real.DoubleType;
+import net.imglib2.util.Intervals;
+import net.imglib2.view.Views;
 
 /**
  * Base class for previewable math commands.
@@ -71,7 +67,7 @@ public abstract class MathCommand<I extends ComplexType<I>, O extends ComplexTyp
 
 	@Parameter
 	protected OverlayService overlayService;
-	
+
 	@Parameter
 	protected OpService opService;
 
@@ -87,20 +83,19 @@ public abstract class MathCommand<I extends ComplexType<I>, O extends ComplexTyp
 	// -- instance variables --
 
 	private O outType;
-	private Img<DoubleType> dataBackup;
-	private PointSetIterator iter;
-	private RandomAccess<? extends RealType<?>> dataAccess;
-	private RandomAccess<? extends RealType<?>> backupAccess;
+	// TODO: not sure whether can we assume that data is of type <I>
+	private RandomAccessibleInterval<I> data;
+	private RandomAccessibleInterval<I> backup;
 	private Dataset dataset;
 	private Overlay overlay;
 	private Position planePos;
-	
+
 	// -- public interface --
 
 	public MathCommand(O outType) {
 		this.outType = outType;
 	}
-	
+
 	@Override
 	public void run() {
 		if (dataset == null) {
@@ -142,71 +137,74 @@ public abstract class MathCommand<I extends ComplexType<I>, O extends ComplexTyp
 	public void setPreview(final boolean preview) {
 		this.preview = preview;
 	}
-	
+
 	public Dataset getDataset() {
 		return dataset;
 	}
 
-	public abstract ComputerOp<O,O> getOperation();
+	public abstract ComputerOp<O, O> getOperation();
 
 	// -- private helpers --
 
+	@SuppressWarnings("unchecked")
 	private void initialize() {
 		dataset = displayService.getActiveDataset(display);
 		overlay = overlayService.getActiveOverlay(display);
 		DatasetView view = displayService.getActiveDatasetView(display);
 		planePos = view.getPlanePosition();
 
-		InplaceUnaryTransform<?,?> xform =
-				getPreviewTransform(dataset, overlay);
-		PointSet region =
-			determineRegion(dataset, xform.getRegionOrigin(), xform.getRegionSpan());
-		iter = region.iterator();
-		ArrayImgFactory<DoubleType> factory = new ArrayImgFactory<DoubleType>();
-		dataBackup = factory.create(new long[] { region.size() }, new DoubleType());
-		backupAccess = dataBackup.randomAccess();
-		dataAccess = dataset.getImgPlus().randomAccess();
+		InplaceUnaryTransform<I, O> xform = getPreviewTransform(dataset, overlay);
+		Interval region = determineRegion(dataset, xform.getRegionOrigin(), xform
+			.getRegionSpan());
+		data = (RandomAccessibleInterval<I>) Views.interval(dataset.getImgPlus(), region);
+		backup = opService.copy().rai(data);
 
 		// check dimensions of Dataset
 		final long w = xform.getRegionSpan()[0];
 		final long h = xform.getRegionSpan()[1];
-		if (w * h > Integer.MAX_VALUE)
-			throw new IllegalArgumentException(
-				"preview region too large to copy into memory");
+		if (w * h > Integer.MAX_VALUE) throw new IllegalArgumentException(
+			"preview region too large to copy into memory");
 	}
 
-	private InplaceUnaryTransform<I,O> getPreviewTransform(
-				Dataset ds, Overlay ov)
+	private InplaceUnaryTransform<I, O> getPreviewTransform(Dataset ds,
+		Overlay ov)
 	{
-		return new InplaceUnaryTransform<I,O>(
-					getOperation(), outType, ds, ov, planePos);
+		return new InplaceUnaryTransform<I, O>(getOperation(), outType, ds, ov,
+			planePos);
 	}
-	
-	private InplaceUnaryTransform<I,O> getFinalTransform(
-			Dataset ds, Overlay ov)
+
+	private InplaceUnaryTransform<I, O> getFinalTransform(Dataset ds,
+		Overlay ov)
 	{
-		if (allPlanes)
-			return new InplaceUnaryTransform<I,O>(
-					getOperation(), outType, ds, ov);
+		if (allPlanes) return new InplaceUnaryTransform<I, O>(getOperation(),
+			outType, ds, ov);
 		return getPreviewTransform(ds, ov);
 	}
 
-	private PointSet determineRegion(Dataset ds, long[] planeOrigin,
+	private Interval determineRegion(Dataset ds, long[] planeOrigin,
 		long[] planeSpan)
 	{
 		// copy data to a double[]
 		final long[] origin = planeOrigin.clone();
 		final long[] offsets = planeSpan.clone();
+		final int size = origin.length;
 		if (ds.isRGBMerged()) {
 			int chIndex = ds.dimensionIndex(Axes.CHANNEL);
 			origin[chIndex] = 0;
 			offsets[chIndex] = 3;
 		}
-		for (int i = 0; i < offsets.length; i++)
+		for (int i = 0; i < size; i++)
 			offsets[i]--;
-		return new HyperVolumePointSet(origin, new long[origin.length], offsets);
+		final long[] minmax = new long[2 * size];
+		for (int i = 0; i < size; i++) {
+			minmax[i] = origin[i];
+		}
+		for (int i = 0; i < size; i++) {
+			minmax[size + i] = origin[i] + offsets[i];
+		}
+		return Intervals.createMinMax(minmax);
 	}
-	
+
 	// NB
 	// We are backing up preview region to doubles. This can cause precision
 	// loss for long backed datasets with large values. But using dataset's
@@ -214,34 +212,20 @@ public abstract class MathCommand<I extends ComplexType<I>, O extends ComplexTyp
 	// various container limitations.
 
 	private void savePreviewRegion() {
-		iter.reset();
-		long pos = 0;
-		while (iter.hasNext()) {
-			dataAccess.setPosition(iter.next());
-			double value = dataAccess.get().getRealDouble();
-			backupAccess.setPosition(pos++, 0);
-			backupAccess.get().setReal(value);
-		}
+		opService.copy().rai(backup, data);
 	}
 
 	private void restorePreviewRegion() {
-		iter.reset();
-		long pos = 0;
-		while (iter.hasNext()) {
-			backupAccess.setPosition(pos++, 0);
-			double value = backupAccess.get().getRealDouble();
-			dataAccess.setPosition(iter.next());
-			dataAccess.get().setReal(value);
-		}
+		opService.copy().rai(data, backup);
 		dataset.update();
 	}
 
 	private void transformFullRegion() {
-		getFinalTransform(dataset,overlay).run();
+		getFinalTransform(dataset, overlay).run();
 	}
 
 	private void transformPreviewRegion() {
-		getPreviewTransform(dataset,overlay).run();
+		getPreviewTransform(dataset, overlay).run();
 	}
 
 }
