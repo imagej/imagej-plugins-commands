@@ -8,13 +8,13 @@
  * %%
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
- * 
+ *
  * 1. Redistributions of source code must retain the above copyright notice,
  *    this list of conditions and the following disclaimer.
  * 2. Redistributions in binary form must reproduce the above copyright notice,
  *    this list of conditions and the following disclaimer in the documentation
  *    and/or other materials provided with the distribution.
- * 
+ *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
  * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
  * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
@@ -40,15 +40,15 @@ import net.imagej.ImgPlus;
 import net.imagej.axis.Axes;
 import net.imagej.axis.AxisType;
 import net.imagej.display.ColorTables;
+import net.imagej.ops.ComputerOp;
+import net.imagej.ops.OpService;
+import net.imagej.ops.Ops;
 import net.imagej.space.SpaceUtils;
 import net.imagej.types.BigComplex;
 import net.imagej.types.DataType;
 import net.imagej.types.DataTypeService;
 import net.imglib2.Cursor;
 import net.imglib2.RandomAccess;
-import net.imglib2.ops.pointset.HyperVolumePointSet;
-import net.imglib2.ops.pointset.PointSet;
-import net.imglib2.ops.pointset.PointSetIterator;
 import net.imglib2.type.NativeType;
 import net.imglib2.type.numeric.RealType;
 import net.imglib2.util.Intervals;
@@ -69,17 +69,13 @@ import org.scijava.plugin.Plugin;
  * desired. Combination is done via channel averaging. After conversion data
  * values are preserved as much as possible but do get clamped to the new data
  * type's valid range.
- * 
+ *
  * @author Barry DeZonia
  */
-@Plugin(type = Command.class,
-	menu = {
-		@Menu(label = MenuConstants.IMAGE_LABEL,
-			weight = MenuConstants.IMAGE_WEIGHT,
-			mnemonic = MenuConstants.IMAGE_MNEMONIC),
-		@Menu(label = "Type", mnemonic = 't'),
-	@Menu(label = "Change...", mnemonic = 'c') },
-	headless = true, attrs = { @Attr(name = "no-legacy") })
+@Plugin(type = Command.class, menu = { @Menu(label = MenuConstants.IMAGE_LABEL,
+	weight = MenuConstants.IMAGE_WEIGHT, mnemonic = MenuConstants.IMAGE_MNEMONIC),
+	@Menu(label = "Type", mnemonic = 't'), @Menu(label = "Change...",
+		mnemonic = 'c') }, headless = true, attrs = { @Attr(name = "no-legacy") })
 public class TypeChanger<U extends RealType<U>, V extends RealType<V> & NativeType<V>>
 	extends DynamicCommand
 {
@@ -101,6 +97,9 @@ public class TypeChanger<U extends RealType<U>, V extends RealType<V> & NativeTy
 	private DataTypeService dataTypeService;
 
 	@Parameter
+	private OpService opService;
+
+	@Parameter
 	private Dataset data;
 
 	@Parameter(label = "Type", persist = false, initializer = "init")
@@ -114,18 +113,18 @@ public class TypeChanger<U extends RealType<U>, V extends RealType<V> & NativeTy
 	@SuppressWarnings("unchecked")
 	@Override
 	public void run() {
-		Class<?> typeClass = data.getImgPlus().firstElement().getClass();
-		DataType<U> inType =
-			(DataType<U>) dataTypeService.getTypeByClass(typeClass);
-		DataType<V> outType = (DataType<V>) dataTypeService.getTypeByName(typeName);
-		int chAxis = data.dimensionIndex(Axes.CHANNEL);
-		long channelCount = (chAxis < 0) ? 1 : data.dimension(chAxis);
+		final Class<?> typeClass = data.getImgPlus().firstElement().getClass();
+		final DataType<U> inType = (DataType<U>) dataTypeService.getTypeByClass(
+			typeClass);
+		final DataType<V> outType = (DataType<V>) dataTypeService.getTypeByName(
+			typeName);
+		final int chAxis = data.dimensionIndex(Axes.CHANNEL);
+		final long channelCount = (chAxis < 0) ? 1 : data.dimension(chAxis);
 		Dataset newData;
 		if (combineChannels && channelCount > 1 &&
 			channelCount <= Integer.MAX_VALUE)
 		{
-			newData =
-				channelAveragingCase(inType, outType, chAxis, (int) channelCount);
+			newData = channelAveragingCase(inType, outType, chAxis);
 		}
 		else { // straight 1 for 1 pixel casting
 			newData = channelPreservingCase(inType, outType);
@@ -137,78 +136,49 @@ public class TypeChanger<U extends RealType<U>, V extends RealType<V> & NativeTy
 	// -- initializers --
 
 	protected void init() {
-		MutableModuleItem<String> input =
-			getInfo().getMutableInput("typeName", String.class);
-		List<String> choices = new ArrayList<String>();
-		for (DataType<?> dataType : dataTypeService.getInstances()) {
+		final MutableModuleItem<String> input = getInfo().getMutableInput(
+			"typeName", String.class);
+		final List<String> choices = new ArrayList<String>();
+		for (final DataType<?> dataType : dataTypeService.getInstances()) {
 			choices.add(dataType.longName());
 		}
 		input.setChoices(choices);
-		RealType<?> dataVar = data.getImgPlus().firstElement();
-		DataType<?> type = dataTypeService.getTypeByClass(dataVar.getClass());
+		final RealType<?> dataVar = data.getImgPlus().firstElement();
+		final DataType<?> type = dataTypeService.getTypeByClass(dataVar.getClass());
 		if (type == null) input.setValue(this, choices.get(0));
 		else input.setValue(this, type.longName());
 	}
 
 	// -- helpers --
 
-	@SuppressWarnings("unchecked")
-	private Dataset channelAveragingCase(DataType<U> inType, DataType<V> outType,
-		int chAxis, int count)
+	private Dataset channelAveragingCase(final DataType<U> inType,
+		final DataType<V> outType, final int chAxis)
 	{
-		BigComplex[] temps = new BigComplex[count];
-		for (int i = 0; i < count; i++) {
-			temps[i] = new BigComplex();
-		}
-		BigComplex combined = new BigComplex();
-		BigComplex divisor = new BigComplex(count, 0);
-		long[] dims = calcDims(Intervals.dimensionsAsLongArray(data), chAxis);
-		AxisType[] axes = calcAxes(SpaceUtils.getAxisTypes(data), chAxis);
-		Dataset newData =
-			datasetService.create(outType.createVariable(), dims, "Converted Image",
-				axes);
-		long[] span = Intervals.dimensionsAsLongArray(data).clone();
-		span[chAxis] = 1;
-		PointSet combinedSpace = new HyperVolumePointSet(span);
-		PointSetIterator iter = combinedSpace.iterator();
-		RandomAccess<U> inAccessor =
-			(RandomAccess<U>) data.getImgPlus().randomAccess();
-		RandomAccess<V> outAccessor =
-			(RandomAccess<V>) newData.getImgPlus().randomAccess();
-		while (iter.hasNext()) {
-			long[] pos = iter.next();
-			inAccessor.setPosition(pos);
-			for (int i = 0; i < count; i++) {
-				inAccessor.setPosition(i, chAxis);
-				inType.cast(inAccessor.get(), temps[i]);
-			}
-			combined.setZero();
-			for (int i = 0; i < count; i++) {
-				combined.add(temps[i]);
-			}
-			int d = 0;
-			for (int i = 0; i < count; i++) {
-				if (i == chAxis) continue;
-				outAccessor.setPosition(pos[i], d++);
-			}
-			combined.div(divisor);
-			outType.cast(combined, outAccessor.get());
-		}
+		final ImgPlus<U> imgIn = data.typedImg(inType.getType());
+		final long[] dims = calcDims(Intervals.dimensionsAsLongArray(data), chAxis);
+		final AxisType[] axes = calcAxes(SpaceUtils.getAxisTypes(data), chAxis);
+		final Dataset newData = datasetService.create(outType.createVariable(),
+			dims, "Converted Image", axes);
+		final ImgPlus<V> imgOut = newData.typedImg(outType.getType());
+		// TODO: not sure if we need converters that work with BigComplex
+		// We could use DataType.cast() to convert instead of relying on the serice
+		final ComputerOp<Iterable<U>, V> meanOp = opService.computer(
+			Ops.Stats.Mean.class, outType.getType(), (Iterable<U>) imgIn);
+		opService.image().project(imgOut, imgIn, meanOp, chAxis);
 		copyMetaDataChannelsCase(data.getImgPlus(), newData.getImgPlus());
 		return newData;
 	}
 
-	private Dataset
-		channelPreservingCase(DataType<U> inType, DataType<V> outType)
+	private Dataset channelPreservingCase(final DataType<U> inType,
+		final DataType<V> outType)
 	{
-		Dataset newData =
-			datasetService.create(outType.createVariable(), Intervals
-				.dimensionsAsLongArray(data), "Converted Image", SpaceUtils
+		final Dataset newData = datasetService.create(outType.createVariable(),
+			Intervals.dimensionsAsLongArray(data), "Converted Image", SpaceUtils
 				.getAxisTypes(data));
-		Cursor<U> inCursor = (Cursor<U>) data.getImgPlus().cursor();
-		RandomAccess<V> outAccessor =
-			(RandomAccess<V>) newData.getImgPlus().randomAccess();
-		BigComplex tmp = new BigComplex();
+		final Cursor<U> inCursor = data.typedImg(inType.getType()).cursor();
+		final RandomAccess<V> outAccessor = newData.typedImg(outType.getType())
+			.randomAccess();
+		final BigComplex tmp = new BigComplex();
 		while (inCursor.hasNext()) {
 			inCursor.fwd();
 			outAccessor.setPosition(inCursor);
@@ -219,7 +189,9 @@ public class TypeChanger<U extends RealType<U>, V extends RealType<V> & NativeTy
 		return newData;
 	}
 
-	private void copyMetaDataDefaultCase(ImgPlus<?> src, ImgPlus<?> dest) {
+	private void copyMetaDataDefaultCase(final ImgPlus<?> src,
+		final ImgPlus<?> dest)
+	{
 
 		// dims and axes already correct
 
@@ -227,20 +199,20 @@ public class TypeChanger<U extends RealType<U>, V extends RealType<V> & NativeTy
 		dest.setName(src.getName());
 
 		// color tables
-		int tableCount = src.getColorTableCount();
+		final int tableCount = src.getColorTableCount();
 		dest.initializeColorTables(tableCount);
 		for (int i = 0; i < tableCount; i++) {
 			dest.setColorTable(src.getColorTable(i), i);
 		}
-		
+
 		// channel min/maxes
-		int chAxis = src.dimensionIndex(Axes.CHANNEL);
+		final int chAxis = src.dimensionIndex(Axes.CHANNEL);
 		int channels;
 		if (chAxis < 0) channels = 1;
 		else channels = (int) src.dimension(chAxis);
 		for (int i = 0; i < channels; i++) {
-			double min = src.getChannelMinimum(i);
-			double max = src.getChannelMaximum(i);
+			final double min = src.getChannelMinimum(i);
+			final double max = src.getChannelMaximum(i);
 			dest.setChannelMinimum(i, min);
 			dest.setChannelMaximum(i, max);
 		}
@@ -251,9 +223,11 @@ public class TypeChanger<U extends RealType<U>, V extends RealType<V> & NativeTy
 		}
 	}
 
-	private void copyMetaDataChannelsCase(ImgPlus<?> src, ImgPlus<?> dest) {
+	private void copyMetaDataChannelsCase(final ImgPlus<?> src,
+		final ImgPlus<?> dest)
+	{
 
-		int chAxis = src.dimensionIndex(Axes.CHANNEL);
+		final int chAxis = src.dimensionIndex(Axes.CHANNEL);
 
 		// dims and axes already correct
 
@@ -262,7 +236,7 @@ public class TypeChanger<U extends RealType<U>, V extends RealType<V> & NativeTy
 
 		// color tables
 		// ACK what is best here?
-		int tableCount = (int) calcTableCount(src, chAxis);
+		final int tableCount = (int) calcTableCount(src, chAxis);
 		dest.initializeColorTables(tableCount);
 		for (int i = 0; i < tableCount; i++) {
 			dest.setColorTable(ColorTables.GRAYS, i);
@@ -289,8 +263,8 @@ public class TypeChanger<U extends RealType<U>, V extends RealType<V> & NativeTy
 		}
 	}
 
-	private long[] calcDims(long[] dims, int chAxis) {
-		long[] outputDims = new long[dims.length - 1];
+	private long[] calcDims(final long[] dims, final int chAxis) {
+		final long[] outputDims = new long[dims.length - 1];
 		int d = 0;
 		for (int i = 0; i < dims.length; i++) {
 			if (i == chAxis) continue;
@@ -299,8 +273,8 @@ public class TypeChanger<U extends RealType<U>, V extends RealType<V> & NativeTy
 		return outputDims;
 	}
 
-	private AxisType[] calcAxes(AxisType[] axes, int chAxis) {
-		AxisType[] outputAxes = new AxisType[axes.length - 1];
+	private AxisType[] calcAxes(final AxisType[] axes, final int chAxis) {
+		final AxisType[] outputAxes = new AxisType[axes.length - 1];
 		int d = 0;
 		for (int i = 0; i < axes.length; i++) {
 			if (i == chAxis) continue;
@@ -309,7 +283,7 @@ public class TypeChanger<U extends RealType<U>, V extends RealType<V> & NativeTy
 		return outputAxes;
 	}
 
-	private long calcTableCount(ImgPlus<?> src, int chAxis) {
+	private long calcTableCount(final ImgPlus<?> src, final int chAxis) {
 		long count = 1;
 		for (int i = 0; i < src.numDimensions(); i++) {
 			if (i == chAxis) continue;
