@@ -114,12 +114,8 @@ public class ImageCalculator<U extends RealType<U>, V extends RealType<V>>
 			throw new IllegalArgumentException(
 				"The dimensions of the two images do not match.");
 		}
-		final long[] min1 = new long[n];
-		final long[] min2 = new long[n];
-		img1.min(min1);
-		img2.min(min2);
-		final RandomAccessibleInterval<U> offsetImg1 = Views.offset(img1, min1);
-		final RandomAccessibleInterval<V> offsetImg2 = Views.offset(img2, min2);
+		final RandomAccessibleInterval<U> offsetImg1 = Views.zeroMin(img1);
+		final RandomAccessibleInterval<V> offsetImg2 = Views.zeroMin(img2);
 		final Interval intersect = Intervals.intersect(offsetImg1, offsetImg2);
 		final RandomAccessibleInterval<U> img1Sub = opService.image().crop(
 			offsetImg1, intersect);
