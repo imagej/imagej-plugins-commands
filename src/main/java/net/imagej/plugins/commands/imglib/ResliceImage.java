@@ -494,6 +494,7 @@ public class ResliceImage<T extends RealType<T>> extends ContextCommand {
 	}
 
 	private ImgPlus<T> newData(long[] newDims, Dataset base) {
+		@SuppressWarnings("unchecked")
 		ImgPlus<T> imgPlus = (ImgPlus<T>) base.getImgPlus();
 		T type = imgPlus.firstElement();
 		ImgFactory<T> factory = imgPlus.factory();
