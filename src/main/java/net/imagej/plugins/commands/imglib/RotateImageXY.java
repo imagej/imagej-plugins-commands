@@ -183,9 +183,9 @@ public class RotateImageXY<T extends RealType<T>> extends ContextCommand {
 
 	// -- helpers --
 
-	private double radians(double angle) {
-		if (angleUnit.equals(RADIANS)) return angle;
-		return (angle * 2.0 * Math.PI) / 360.0;
+	private double radians(double ang) {
+		if (angleUnit.equals(RADIANS)) return ang;
+		return (ang * 2.0 * Math.PI) / 360.0;
 	}
 	
 	private void resampleData(Dataset ds, double angleInRadians) {
