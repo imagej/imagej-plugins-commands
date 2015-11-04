@@ -36,29 +36,19 @@ import java.util.Arrays;
 import net.imagej.Dataset;
 import net.imagej.DatasetService;
 import net.imagej.autoscale.AutoscaleService;
-import net.imagej.autoscale.DataRange;
 import net.imagej.axis.Axes;
 import net.imagej.axis.AxisType;
 import net.imagej.axis.CalibratedAxis;
 import net.imagej.display.ImageDisplayService;
-import net.imagej.threshold.ThresholdMethod;
-import net.imagej.threshold.ThresholdService;
-import net.imglib2.IterableInterval;
-import net.imglib2.RandomAccess;
+import net.imagej.ops.ComputerOp;
+import net.imagej.ops.OpService;
+import net.imagej.ops.Ops;
 import net.imglib2.display.ColorTable8;
-import net.imglib2.histogram.Histogram1d;
-import net.imglib2.histogram.Real1dBinMapper;
 import net.imglib2.img.Img;
 import net.imglib2.img.cell.AbstractCellImg;
-import net.imglib2.util.Intervals;
-import net.imglib2.ops.pointset.HyperVolumePointSet;
-import net.imglib2.ops.pointset.PointSet;
-import net.imglib2.ops.pointset.PointSetIterator;
 import net.imglib2.type.logic.BitType;
 import net.imglib2.type.numeric.RealType;
-import net.imglib2.type.numeric.real.DoubleType;
-import net.imglib2.view.IntervalView;
-import net.imglib2.view.Views;
+import net.imglib2.util.Intervals;
 
 import org.scijava.ItemIO;
 import org.scijava.command.Command;
@@ -77,12 +67,11 @@ import org.scijava.plugin.Plugin;
  * 
  * @author Barry DeZonia
  */
-@Plugin(type = Command.class, initializer = "init", menu = {
-	@Menu(label = MenuConstants.PROCESS_LABEL,
-		weight = MenuConstants.PROCESS_WEIGHT,
-		mnemonic = MenuConstants.PROCESS_MNEMONIC),
-	@Menu(label = "Binary", mnemonic = 'b'), @Menu(label = "Binarize...") },
-	headless = true, attrs = { @Attr(name = "no-legacy") })
+@Plugin(type = Command.class, initializer = "init", menu = { @Menu(
+	label = MenuConstants.PROCESS_LABEL, weight = MenuConstants.PROCESS_WEIGHT,
+	mnemonic = MenuConstants.PROCESS_MNEMONIC), @Menu(label = "Binary",
+		mnemonic = 'b'), @Menu(label = "Binarize...") }, headless = true, attrs = {
+			@Attr(name = "no-legacy") })
 public class Binarize<T extends RealType<T>> extends ContextCommand {
 
 	// TODO - is the following approach even necessary?
@@ -92,13 +81,13 @@ public class Binarize<T extends RealType<T>> extends ContextCommand {
 	// operation from a script for instance.
 
 	// -- constants --
-	
+
 	public static final String INSIDE = "Inside threshold";
 	public static final String OUTSIDE = "Outside threshold";
 	public static final String WHITE = "White";
 	public static final String BLACK = "Black";
 	public static final String DEFAULT_METHOD = "Default";
-	
+
 	// -- Parameters --
 
 	@Parameter
@@ -111,7 +100,7 @@ public class Binarize<T extends RealType<T>> extends ContextCommand {
 	private Dataset outputMask = null;
 
 	@Parameter(label = "Threshold method")
-	private ThresholdMethod method = null; // TODO: Not String: scriptable?
+	private String method = null; // DOTO: create some choices for the method
 
 	@Parameter(label = "Mask pixels", choices = { INSIDE, OUTSIDE })
 	private String maskPixels = INSIDE;
@@ -132,9 +121,6 @@ public class Binarize<T extends RealType<T>> extends ContextCommand {
 	private boolean changeInput = false;
 
 	@Parameter
-	private ThresholdService threshSrv;
-
-	@Parameter
 	private ImageDisplayService imgDispSrv;
 
 	@Parameter
@@ -143,6 +129,9 @@ public class Binarize<T extends RealType<T>> extends ContextCommand {
 	@Parameter
 	private AutoscaleService autoscaleSrv;
 
+	@Parameter
+	private OpService opService;
+
 	// -- accessors --
 
 	/**
@@ -150,14 +139,14 @@ public class Binarize<T extends RealType<T>> extends ContextCommand {
 	 * 
 	 * @param thresholdMethod The name of the threshold method to use.
 	 */
-	public void setThresholdMethod(ThresholdMethod thresholdMethod) {
+	public void setThresholdMethod(String thresholdMethod) {
 		method = thresholdMethod;
 	}
 
 	/**
 	 * Gets the threshold method used for pixel discrimination.
 	 */
-	public ThresholdMethod thresholdMethod() {
+	public String thresholdMethod() {
 		return method;
 	}
 
@@ -310,7 +299,7 @@ public class Binarize<T extends RealType<T>> extends ContextCommand {
 	 * Sets the threshold method to the default algorithm.
 	 */
 	public void setDefaultThresholdMethod() {
-		method = threshSrv.getThresholdMethod("Default");
+		method = "Ops.Threshold.Mean";
 	}
 
 	// -- Command methods --
@@ -330,44 +319,27 @@ public class Binarize<T extends RealType<T>> extends ContextCommand {
 		for (int i = 0; i < dims.length; i++) {
 			types[i] = axes[i].type();
 		}
-		Dataset mask =
-			inputMask != null ? inputMask : datasetSrv.create(new BitType(), dims,
-				"Mask", types, isVirtual(inputData));
+		Dataset mask = inputMask != null ? inputMask : datasetSrv.create(
+			new BitType(), dims, "Mask", types, isVirtual(inputData));
 		mask.setAxes(axes);
-		RandomAccess<BitType> maskAccessor =
-			(RandomAccess<BitType>) mask.getImgPlus().randomAccess();
-		RandomAccess<? extends RealType<?>> dataAccessor =
-			inputData.getImgPlus().randomAccess();
-		DataRange minMax = calcDataRange(inputData);
-		Histogram1d<T> histogram = null;
-		boolean testLess = maskPixels.equals(INSIDE);
-		DoubleType val = new DoubleType();
-		// TODO - use Views and Cursors instead of PointSets and RandomAccess?
-		// Better performance? Especially for CellImgs?
+		Img<BitType> maskImg = mask.typedImg(new BitType());
+		final ComputerOp<Dataset, Img<BitType>> thresholdMethod =
+			(ComputerOp<Dataset, Img<BitType>>) opService.op(qualifiedMethod(),
+				maskImg, inputData);
 		if (thresholdEachPlane && planeCount(inputData) > 1) {
 			// threshold each plane separately
-			long[] planeSpace = planeSpace(inputData);
-			PointSetIterator pIter = new HyperVolumePointSet(planeSpace).iterator();
-			while (pIter.hasNext()) {
-				long[] planePos = pIter.next();
-				histogram = buildHistogram(inputData, planePos, minMax, histogram);
-				double cutoffVal = cutoff(histogram, method, testLess, val);
-				PointSet planeData = planeData(inputData, planePos);
-				PointSetIterator iter = planeData.iterator();
-				while (iter.hasNext()) {
-					updateMask(iter.next(), testLess, cutoffVal, dataAccessor,
-						maskAccessor);
-				}
-			}
+			final int xDim = inputData.dimensionIndex(Axes.X);
+			final int yDim = inputData.dimensionIndex(Axes.Y);
+			final int[] xyDim = new int[] { xDim, yDim };
+			opService.slicewise(maskImg, inputData, thresholdMethod, xyDim);
 		}
 		else { // threshold entire dataset once
-			histogram = buildHistogram(inputData, null, minMax, null);
-			double cutoffVal = cutoff(histogram, method, testLess, val);
-			PointSet fullData = fullData(dims);
-			PointSetIterator iter = fullData.iterator();
-			while (iter.hasNext()) {
-				updateMask(iter.next(), testLess, cutoffVal, dataAccessor, maskAccessor);
-			}
+			thresholdMethod.compute(inputData, maskImg);
+		}
+		if (!maskPixels.equals(INSIDE)) {
+			final ComputerOp<BitType, BitType> not = opService.computer(
+				Ops.Logic.Not.class, BitType.class, BitType.class);
+			opService.map(maskImg, not);
 		}
 		assignColorTables(mask);
 		if (changeInput) {
@@ -375,28 +347,23 @@ public class Binarize<T extends RealType<T>> extends ContextCommand {
 			inputData.setImgPlus(mask.getImgPlus());
 		}
 		else outputMask = mask;
-	}
-
-	// -- initializer --
-
-	@SuppressWarnings("unused")
-	private void init() {
-		setDefaultThresholdMethod();
+		// TODO - not sure should we update the dataset
+		mask.update();
 	}
 
 	// -- helpers --
+
+	// returns the qualified name of the threshold method
+
+	private String qualifiedMethod() {
+		return "Ops.threshold." + method;
+	}
 
 	// returns true if a given dataset is stored in a CellImg structure
 
 	private boolean isVirtual(Dataset ds) {
 		final Img<?> img = ds.getImgPlus().getImg();
 		return AbstractCellImg.class.isAssignableFrom(img.getClass());
-	}
-
-	// gets the range of the pixel values in a dataset
-
-	private DataRange calcDataRange(Dataset ds) {
-		return autoscaleSrv.getDefaultIntervalRange(ds.getImgPlus());
 	}
 
 	// returns the number of planes in a dataset
@@ -423,142 +390,6 @@ public class Binarize<T extends RealType<T>> extends ContextCommand {
 			planeSpace[i++] = ds.dimension(d);
 		}
 		return planeSpace;
-	}
-
-	// calculates the histogram of a portion of the dataset. if planePos is null
-	// the region is the entire dataset. Otherwise it is the single plane.
-
-	private Histogram1d<T> buildHistogram(Dataset ds, long[] planePos,
-		DataRange minMax, Histogram1d<T> existingHist)
-	{
-		long[] min = new long[ds.numDimensions()];
-		long[] max = min.clone();
-		int xIndex = ds.dimensionIndex(Axes.X);
-		int yIndex = ds.dimensionIndex(Axes.Y);
-		// TODO - figure out what to do when no X axis or no Y axis present
-		int i = 0;
-		for (int d = 0; d < ds.numDimensions(); d++) {
-			if (planePos == null || d == xIndex || d == yIndex) {
-				min[d] = 0;
-				max[d] = ds.dimension(d) - 1;
-			}
-			else {
-				// it's a plane dimension from within planePos
-				min[d] = planePos[i];
-				max[d] = planePos[i];
-				i++;
-			}
-		}
-		@SuppressWarnings("unchecked")
-		Img<T> img = (Img<T>) ds.getImgPlus();
-		IntervalView<T> view = Views.interval(img, min, max);
-		IterableInterval<T> data = Views.iterable(view);
-		final Histogram1d<T> histogram;
-		if (existingHist == null) {
-			histogram = allocateHistogram(ds.isInteger(), minMax);
-		}
-		else {
-			existingHist.resetCounters();
-			histogram = existingHist;
-		}
-		histogram.countData(data);
-		return histogram;
-	}
-
-	// allocates a histogram after determining a good size
-
-	private Histogram1d<T> allocateHistogram(boolean dataIsIntegral,
-		DataRange dataRange)
-	{
-		double range = dataRange.getExtent();
-		if (dataIsIntegral) range++;
-		Real1dBinMapper<T> binMapper = null;
-		// TODO - size of histogram affects speed of all autothresh methods
-		// What is the best way to determine size?
-		// Do we want some power of two as size? For now yes.
-		final int maxBinCount = 16384;
-		for (int binCount = 256; binCount <= maxBinCount; binCount *= 2) {
-			if (range <= binCount) {
-				binMapper =
-					new Real1dBinMapper<T>(dataRange.getMin(), dataRange.getMax(),
-						binCount, false);
-				break;
-			}
-		}
-		if (binMapper == null) {
-			binMapper =
-				new Real1dBinMapper<T>(dataRange.getMin(), dataRange.getMax(),
-					maxBinCount, false);
-		}
-		return new Histogram1d<T>(binMapper);
-	}
-
-	// determines the data value that delineates the threshold point
-
-	@SuppressWarnings({ "unchecked", "rawtypes" })
-	private double cutoff(Histogram1d<T> hist, ThresholdMethod thresholdMethod,
-		boolean testLess, DoubleType val)
-	{
-		long threshIndex = thresholdMethod.getThreshold(hist);
-		if (testLess) hist.getUpperBound(threshIndex, (T) (RealType) val);
-		else hist.getLowerBound(threshIndex, (T) (RealType) val);
-		return val.getRealDouble();
-	}
-
-	// updates the mask pixel values for which the data values are on the correct
-	// side of the cutoff value.
-
-	private void updateMask(long[] pos, boolean testLess, double cutoffVal,
-		RandomAccess<? extends RealType<?>> dataAccessor,
-		RandomAccess<BitType> maskAccessor)
-	{
-		dataAccessor.setPosition(pos);
-		boolean partOfMask;
-		if (testLess) {
-			partOfMask = dataAccessor.get().getRealDouble() <= cutoffVal;
-		}
-		else { // test greater
-			partOfMask = dataAccessor.get().getRealDouble() >= cutoffVal;
-		}
-		if (partOfMask) {
-			if (fillFg) {
-				maskAccessor.setPosition(pos);
-				maskAccessor.get().set(true);
-			}
-		}
-		else { // not part of mask
-			if (fillBg) {
-				maskAccessor.setPosition(pos);
-				maskAccessor.get().set(false);
-			}
-		}
-	}
-
-	// returns a PointSet that represents the points in a plane of a dataset
-
-	private PointSet planeData(Dataset ds, long[] planePos) {
-		long[] pt1 = new long[ds.numDimensions()];
-		long[] pt2 = new long[ds.numDimensions()];
-		int i = 0;
-		for (int d = 0; d < ds.numDimensions(); d++) {
-			AxisType type = ds.axis(d).type();
-			if (type == Axes.X || type == Axes.Y) {
-				pt1[d] = 0;
-				pt2[d] = ds.dimension(d) - 1;
-			}
-			else {
-				pt1[d] = planePos[i];
-				pt2[d] = planePos[i];
-				i++;
-			}
-		}
-		return new HyperVolumePointSet(pt1, pt2);
-	}
-
-	// returns a PointSet that represents all the points in a dataset
-
-	private PointSet fullData(long[] dims) {
-		return new HyperVolumePointSet(dims);
 	}
 
 	// sets each dataset plane's color table
@@ -615,8 +446,7 @@ public class Binarize<T extends RealType<T>> extends ContextCommand {
 		if (mask == null) return null;
 
 		// check that mask is of type BitType
-		if (!(mask.getImgPlus().firstElement() instanceof BitType))
-		{
+		if (!(mask.getImgPlus().firstElement() instanceof BitType)) {
 			return "Mask is not a binary image";
 		}
 
