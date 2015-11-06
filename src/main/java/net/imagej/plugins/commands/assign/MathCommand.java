@@ -31,14 +31,8 @@
 
 package net.imagej.plugins.commands.assign;
 
-import org.scijava.ItemIO;
-import org.scijava.command.ContextCommand;
-import org.scijava.command.Previewable;
-import org.scijava.plugin.Parameter;
-
 import net.imagej.Dataset;
 import net.imagej.Position;
-import net.imagej.axis.Axes;
 import net.imagej.display.DatasetView;
 import net.imagej.display.ImageDisplay;
 import net.imagej.display.ImageDisplayService;
@@ -49,16 +43,20 @@ import net.imagej.overlay.Overlay;
 import net.imglib2.Interval;
 import net.imglib2.RandomAccessibleInterval;
 import net.imglib2.type.numeric.ComplexType;
-import net.imglib2.util.Intervals;
 import net.imglib2.view.Views;
+
+import org.scijava.ItemIO;
+import org.scijava.command.ContextCommand;
+import org.scijava.command.Previewable;
+import org.scijava.plugin.Parameter;
 
 /**
  * Base class for previewable math commands.
  * 
  * @author Barry DeZonia
  */
-public abstract class MathCommand<I extends ComplexType<I>, O extends ComplexType<O>>
-	extends ContextCommand implements Previewable
+public abstract class MathCommand<T extends ComplexType<T>> extends
+	ContextCommand implements Previewable
 {
 	// -- instance variables that are Parameters --
 
@@ -82,19 +80,15 @@ public abstract class MathCommand<I extends ComplexType<I>, O extends ComplexTyp
 
 	// -- instance variables --
 
-	private O outType;
-	// TODO: not sure whether can we assume that data is of type <I>
-	private RandomAccessibleInterval<I> data;
-	private RandomAccessibleInterval<I> backup;
+	T type;
+	// TODO: not sure whether can we assume that data is of type <T>
+	private RandomAccessibleInterval<T> data;
+	private RandomAccessibleInterval<T> backup;
 	private Dataset dataset;
 	private Overlay overlay;
 	private Position planePos;
 
 	// -- public interface --
-
-	public MathCommand(O outType) {
-		this.outType = outType;
-	}
 
 	@Override
 	public void run() {
@@ -142,7 +136,7 @@ public abstract class MathCommand<I extends ComplexType<I>, O extends ComplexTyp
 		return dataset;
 	}
 
-	public abstract ComputerOp<O, O> getOperation();
+	public abstract ComputerOp<T, T> getOperation();
 
 	// -- private helpers --
 
@@ -153,56 +147,27 @@ public abstract class MathCommand<I extends ComplexType<I>, O extends ComplexTyp
 		DatasetView view = displayService.getActiveDatasetView(display);
 		planePos = view.getPlanePosition();
 
-		InplaceUnaryTransform<I, O> xform = getPreviewTransform(dataset, overlay);
-		Interval region = determineRegion(dataset, xform.getRegionOrigin(), xform
-			.getRegionSpan());
-		data = (RandomAccessibleInterval<I>) Views.interval(dataset.getImgPlus(), region);
+		InplaceUnaryTransform<T> xform = getPreviewTransform(dataset, overlay);
+		Interval region = xform.getRegion();
+		data = (RandomAccessibleInterval<T>) Views.interval(dataset.getImgPlus(),
+			region);
 		backup = opService.copy().rai(data);
+		type = data.randomAccess().get().createVariable();
 
 		// check dimensions of Dataset
-		final long w = xform.getRegionSpan()[0];
-		final long h = xform.getRegionSpan()[1];
+		final long w = region.dimension(0);
+		final long h = region.dimension(1);
 		if (w * h > Integer.MAX_VALUE) throw new IllegalArgumentException(
 			"preview region too large to copy into memory");
 	}
 
-	private InplaceUnaryTransform<I, O> getPreviewTransform(Dataset ds,
-		Overlay ov)
-	{
-		return new InplaceUnaryTransform<I, O>(getOperation(), outType, ds, ov,
-			planePos);
+	private InplaceUnaryTransform<T> getPreviewTransform(Dataset ds, Overlay ov) {
+		return new InplaceUnaryTransform<T>(getOperation(), ds, ov, planePos);
 	}
 
-	private InplaceUnaryTransform<I, O> getFinalTransform(Dataset ds,
-		Overlay ov)
-	{
-		if (allPlanes) return new InplaceUnaryTransform<I, O>(getOperation(),
-			outType, ds, ov);
+	private InplaceUnaryTransform<T> getFinalTransform(Dataset ds, Overlay ov) {
+		if (allPlanes) return new InplaceUnaryTransform<T>(getOperation(), ds, ov);
 		return getPreviewTransform(ds, ov);
-	}
-
-	private Interval determineRegion(Dataset ds, long[] planeOrigin,
-		long[] planeSpan)
-	{
-		// copy data to a double[]
-		final long[] origin = planeOrigin.clone();
-		final long[] offsets = planeSpan.clone();
-		final int size = origin.length;
-		if (ds.isRGBMerged()) {
-			int chIndex = ds.dimensionIndex(Axes.CHANNEL);
-			origin[chIndex] = 0;
-			offsets[chIndex] = 3;
-		}
-		for (int i = 0; i < size; i++)
-			offsets[i]--;
-		final long[] minmax = new long[2 * size];
-		for (int i = 0; i < size; i++) {
-			minmax[i] = origin[i];
-		}
-		for (int i = 0; i < size; i++) {
-			minmax[size + i] = origin[i] + offsets[i];
-		}
-		return Intervals.createMinMax(minmax);
 	}
 
 	// NB

@@ -31,6 +31,13 @@
 
 package net.imagej.plugins.commands.assign;
 
+import net.imagej.Dataset;
+import net.imagej.ops.ComputerOp;
+import net.imagej.ops.Ops;
+import net.imagej.options.OptionsCompatibility;
+import net.imglib2.Cursor;
+import net.imglib2.type.numeric.RealType;
+
 import org.scijava.command.Command;
 import org.scijava.menu.MenuConstants;
 import org.scijava.options.OptionsService;
@@ -38,14 +45,6 @@ import org.scijava.plugin.Attr;
 import org.scijava.plugin.Menu;
 import org.scijava.plugin.Parameter;
 import org.scijava.plugin.Plugin;
-
-import net.imagej.Dataset;
-import net.imagej.ops.ComputerOp;
-import net.imagej.ops.Ops;
-import net.imagej.options.OptionsCompatibility;
-import net.imglib2.Cursor;
-import net.imglib2.type.numeric.RealType;
-import net.imglib2.type.numeric.real.DoubleType;
 
 /**
  * Fills an output Dataset by applying an inversion to an input Dataset's data
@@ -59,15 +58,9 @@ import net.imglib2.type.numeric.real.DoubleType;
 	weight = MenuConstants.EDIT_WEIGHT, mnemonic = MenuConstants.EDIT_MNEMONIC),
 	@Menu(label = "Invert...", weight = 30, accelerator = "shift ^I") },
 	headless = true, attrs = { @Attr(name = "no-legacy") })
-public class InvertDataValues<T extends RealType<T>> extends
-	MathCommand<T, DoubleType>
-{
+public class InvertDataValues<T extends RealType<T>> extends MathCommand<T> {
 
 	// -- instance variables that are Parameters --
-
-	public InvertDataValues() {
-		super(new DoubleType());
-	}
 
 	@Parameter
 	private OptionsService optionsService;
@@ -79,7 +72,7 @@ public class InvertDataValues<T extends RealType<T>> extends
 	// -- public interface --
 
 	@Override
-	public ComputerOp<DoubleType, DoubleType> getOperation() {
+	public ComputerOp<T, T> getOperation() {
 		final OptionsCompatibility options = optionsService.getOptions(
 			OptionsCompatibility.class);
 		final Dataset dataset = getDataset();
@@ -92,8 +85,7 @@ public class InvertDataValues<T extends RealType<T>> extends
 		}
 		else calcValueRange(dataset);
 
-		return opService.computer(Ops.Math.Invert.class, DoubleType.class,
-			DoubleType.class, min, max);
+		return opService.computer(Ops.Math.Invert.class, type, type, min, max);
 	}
 
 	// -- private interface --

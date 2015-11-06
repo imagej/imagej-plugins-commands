@@ -31,17 +31,16 @@
 
 package net.imagej.plugins.commands.assign;
 
+import net.imagej.ops.ComputerOp;
+import net.imagej.ops.Ops;
+import net.imglib2.type.numeric.RealType;
+
 import org.scijava.command.Command;
 import org.scijava.menu.MenuConstants;
 import org.scijava.plugin.Attr;
 import org.scijava.plugin.Menu;
 import org.scijava.plugin.Parameter;
 import org.scijava.plugin.Plugin;
-
-import net.imagej.ops.ComputerOp;
-import net.imagej.ops.Ops;
-import net.imglib2.type.numeric.RealType;
-import net.imglib2.type.numeric.real.DoubleType;
 
 /**
  * Fills an output Dataset by adding a user defined constant value to an input
@@ -55,19 +54,13 @@ import net.imglib2.type.numeric.real.DoubleType;
 		mnemonic = MenuConstants.PROCESS_MNEMONIC), @Menu(label = "Math",
 			mnemonic = 'm'), @Menu(label = "Add...", weight = 1) }, headless = true,
 	attrs = { @Attr(name = "no-legacy") })
-public class AddToDataValues<T extends RealType<T>> extends
-	MathCommand<T, DoubleType>
-{
+public class AddToDataValues<T extends RealType<T>> extends MathCommand<T> {
 	// -- Parameters --
 
 	@Parameter(label = "Value")
 	private double value;
 
 	// -- public interface --
-
-	public AddToDataValues() {
-		super(new DoubleType());
-	}
 
 	public double getValue() {
 		return value;
@@ -80,8 +73,7 @@ public class AddToDataValues<T extends RealType<T>> extends
 	// -- private helpers --
 
 	@Override
-	public ComputerOp<DoubleType, DoubleType> getOperation() {
-		return opService.computer(Ops.Math.Add.class, DoubleType.class,
-			DoubleType.class, value);
+	public ComputerOp<T, T> getOperation() {
+		return opService.computer(Ops.Math.Add.class, type, type, value);
 	}
 }

@@ -31,6 +31,10 @@
 
 package net.imagej.plugins.commands.assign;
 
+import net.imagej.ops.ComputerOp;
+import net.imagej.ops.Ops;
+import net.imglib2.type.numeric.RealType;
+
 import org.scijava.command.Command;
 import org.scijava.menu.MenuConstants;
 import org.scijava.plugin.Attr;
@@ -38,41 +42,31 @@ import org.scijava.plugin.Menu;
 import org.scijava.plugin.Parameter;
 import org.scijava.plugin.Plugin;
 
-import net.imagej.ops.ComputerOp;
-import net.imagej.ops.Ops;
-import net.imglib2.type.numeric.RealType;
-import net.imglib2.type.numeric.real.DoubleType;
-
 /**
  * Fills an output Dataset by applying Poisson noise to an input Dataset.
  * 
  * @author Leon Yang
  */
-@Plugin(type = Command.class, menu = {
-	@Menu(label = MenuConstants.PROCESS_LABEL,
-		weight = MenuConstants.PROCESS_WEIGHT,
-		mnemonic = MenuConstants.PROCESS_MNEMONIC),
-	@Menu(label = "Noise", mnemonic = 'n'),
-	@Menu(label = "Add Specified Noise...", weight = 2) }, headless = true, attrs = { @Attr(name = "no-legacy") })
-public class AddPoissonNoiseToDataValues<T extends RealType<T>>
-	extends MathCommand<T, DoubleType>
+@Plugin(type = Command.class, menu = { @Menu(
+	label = MenuConstants.PROCESS_LABEL, weight = MenuConstants.PROCESS_WEIGHT,
+	mnemonic = MenuConstants.PROCESS_MNEMONIC), @Menu(label = "Noise",
+		mnemonic = 'n'), @Menu(label = "Add Specified Noise...", weight = 2) },
+	headless = true, attrs = { @Attr(name = "no-legacy") })
+public class AddPoissonNoiseToDataValues<T extends RealType<T>> extends
+	MathCommand<T>
 {
-	
-	public AddPoissonNoiseToDataValues() {
-		super(new DoubleType());
-	}
 
 	// -- instance variables that are Parameters --
-	
+
 	@Parameter(label = "Seed", required = false)
-	private long seed = 0xabcdef1234567890L; 
+	private long seed = 0xabcdef1234567890L;
 
 	// -- public interface --
 
 	@Override
-	public ComputerOp<DoubleType, DoubleType> getOperation() {
-		return opService.computer(Ops.Filter.AddPoissonNoise.class,
-			DoubleType.class, DoubleType.class, seed);
+	public ComputerOp<T, T> getOperation() {
+		return opService.computer(Ops.Filter.AddPoissonNoise.class, type, type,
+			seed);
 	}
-	
+
 }

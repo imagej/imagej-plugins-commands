@@ -31,6 +31,11 @@
 
 package net.imagej.plugins.commands.assign;
 
+import net.imagej.ops.ComputerOp;
+import net.imagej.ops.Ops;
+import net.imagej.options.OptionsMisc;
+import net.imglib2.type.numeric.RealType;
+
 import org.scijava.command.Command;
 import org.scijava.menu.MenuConstants;
 import org.scijava.options.OptionsService;
@@ -38,12 +43,6 @@ import org.scijava.plugin.Attr;
 import org.scijava.plugin.Menu;
 import org.scijava.plugin.Parameter;
 import org.scijava.plugin.Plugin;
-
-import net.imagej.ops.ComputerOp;
-import net.imagej.ops.Ops;
-import net.imagej.options.OptionsMisc;
-import net.imglib2.type.numeric.RealType;
-import net.imglib2.type.numeric.real.DoubleType;
 
 /**
  * Fills an output Dataset by taking reciprocal values of an input Dataset.
@@ -57,7 +56,7 @@ import net.imglib2.type.numeric.real.DoubleType;
 		mnemonic = 'm'), @Menu(label = "Reciprocal...", weight = 17) },
 	headless = true, attrs = { @Attr(name = "no-legacy") })
 public class ReciprocalDataValues<T extends RealType<T>> extends
-	MathCommand<T, DoubleType>
+	MathCommand<T>
 {
 	// -- instance variables that are Parameters --
 
@@ -66,12 +65,8 @@ public class ReciprocalDataValues<T extends RealType<T>> extends
 
 	// -- public interface --
 
-	public ReciprocalDataValues() {
-		super(new DoubleType());
-	}
-
 	@Override
-	public ComputerOp<DoubleType, DoubleType> getOperation() {
+	public ComputerOp<T, T> getOperation() {
 		final OptionsMisc optionsMisc = optionsService.getOptions(
 			OptionsMisc.class);
 		final String dbzString = optionsMisc.getDivByZeroVal();
@@ -82,8 +77,7 @@ public class ReciprocalDataValues<T extends RealType<T>> extends
 		catch (final NumberFormatException e) {
 			dbzVal = Double.POSITIVE_INFINITY;
 		}
-		return opService.computer(Ops.Math.Reciprocal.class, DoubleType.class,
-			DoubleType.class, dbzVal);
+		return opService.computer(Ops.Math.Reciprocal.class, type, type, dbzVal);
 	}
 
 }

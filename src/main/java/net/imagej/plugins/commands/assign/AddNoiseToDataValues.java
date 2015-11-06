@@ -31,6 +31,11 @@
 
 package net.imagej.plugins.commands.assign;
 
+import net.imagej.Dataset;
+import net.imagej.ops.ComputerOp;
+import net.imagej.ops.Ops;
+import net.imglib2.type.numeric.RealType;
+
 import org.scijava.command.Command;
 import org.scijava.menu.MenuConstants;
 import org.scijava.plugin.Attr;
@@ -38,57 +43,46 @@ import org.scijava.plugin.Menu;
 import org.scijava.plugin.Parameter;
 import org.scijava.plugin.Plugin;
 
-import net.imagej.Dataset;
-import net.imagej.ops.ComputerOp;
-import net.imagej.ops.Ops;
-import net.imglib2.type.numeric.RealType;
-import net.imglib2.type.numeric.real.DoubleType;
-
 /**
  * Fills an output Dataset by applying a user calibrated amount of normal noise
  * to an input Dataset.
  * 
  * @author Barry DeZonia
  */
-@Plugin(type = Command.class, menu = {
-	@Menu(label = MenuConstants.PROCESS_LABEL,
-		weight = MenuConstants.PROCESS_WEIGHT,
-		mnemonic = MenuConstants.PROCESS_MNEMONIC),
-	@Menu(label = "Noise", mnemonic = 'n'),
-	@Menu(label = "Add Specified Noise...", weight = 1) }, headless = true, attrs = { @Attr(name = "no-legacy") })
-public class AddNoiseToDataValues<T extends RealType<T>>
-	extends MathCommand<T, DoubleType>
+@Plugin(type = Command.class, menu = { @Menu(
+	label = MenuConstants.PROCESS_LABEL, weight = MenuConstants.PROCESS_WEIGHT,
+	mnemonic = MenuConstants.PROCESS_MNEMONIC), @Menu(label = "Noise",
+		mnemonic = 'n'), @Menu(label = "Add Specified Noise...", weight = 1) },
+	headless = true, attrs = { @Attr(name = "no-legacy") })
+public class AddNoiseToDataValues<T extends RealType<T>> extends
+	MathCommand<T>
 {
-	
-	public AddNoiseToDataValues() {
-		super(new DoubleType());
-	}
 
 	// -- instance variables that are Parameters --
 
 	@Parameter(label = "Standard deviation", required = false)
 	private double stdDev = 25.0;
-	
+
 	@Parameter(label = "Seed", required = false)
-	private long seed = 0xabcdef1234567890L; 
+	private long seed = 0xabcdef1234567890L;
 
 	// -- public interface --
 
 	@Override
-	public ComputerOp<DoubleType, DoubleType> getOperation() {
+	public ComputerOp<T, T> getOperation() {
 		final Dataset dataset = getDataset();
 		final double rangeMin = dataset.getType().getMinValue();
 		final double rangeMax = dataset.getType().getMaxValue();
-		return opService.computer(Ops.Filter.AddNoise.class, DoubleType.class,
-			DoubleType.class, rangeMin, rangeMax, stdDev, seed);
+		return opService.computer(Ops.Filter.AddNoise.class, type, type, rangeMin,
+			rangeMax, stdDev, seed);
 	}
-	
+
 	public double getStdDev() {
 		return stdDev;
 	}
-	
+
 	public void setStdDev(double stdDev) {
 		this.stdDev = stdDev;
 	}
-	
+
 }

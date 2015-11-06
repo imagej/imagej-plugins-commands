@@ -31,17 +31,16 @@
 
 package net.imagej.plugins.commands.assign;
 
+import net.imagej.ops.ComputerOp;
+import net.imagej.ops.Ops;
+import net.imglib2.type.numeric.RealType;
+
 import org.scijava.command.Command;
 import org.scijava.menu.MenuConstants;
 import org.scijava.plugin.Attr;
 import org.scijava.plugin.Menu;
 import org.scijava.plugin.Parameter;
 import org.scijava.plugin.Plugin;
-
-import net.imagej.ops.ComputerOp;
-import net.imagej.ops.Ops;
-import net.imglib2.type.numeric.RealType;
-import net.imglib2.type.numeric.real.DoubleType;
 
 /**
  * Fills an output Dataset by raising input Dataset values to a user defined
@@ -54,9 +53,7 @@ import net.imglib2.type.numeric.real.DoubleType;
 	mnemonic = MenuConstants.PROCESS_MNEMONIC), @Menu(label = "Math",
 		mnemonic = 'm'), @Menu(label = "Power...", weight = 5) }, headless = true,
 	attrs = { @Attr(name = "no-legacy") })
-public class PowerDataValues<T extends RealType<T>> extends
-	MathCommand<T, DoubleType>
-{
+public class PowerDataValues<T extends RealType<T>> extends MathCommand<T> {
 
 	// -- instance variables that are Parameters --
 
@@ -65,14 +62,9 @@ public class PowerDataValues<T extends RealType<T>> extends
 
 	// -- public interface --
 
-	public PowerDataValues() {
-		super(new DoubleType());
-	}
-
 	@Override
-	public ComputerOp<DoubleType, DoubleType> getOperation() {
-		return opService.computer(Ops.Math.Power.class, DoubleType.class,
-			DoubleType.class, value);
+	public ComputerOp<T, T> getOperation() {
+		return opService.computer(Ops.Math.Power.class, type, type, value);
 	}
 
 	public double getValue() {

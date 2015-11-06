@@ -31,16 +31,15 @@
 
 package net.imagej.plugins.commands.assign;
 
+import net.imagej.ops.ComputerOp;
+import net.imagej.ops.Ops;
+import net.imglib2.type.numeric.RealType;
+
 import org.scijava.command.Command;
 import org.scijava.menu.MenuConstants;
 import org.scijava.plugin.Attr;
 import org.scijava.plugin.Menu;
 import org.scijava.plugin.Plugin;
-
-import net.imagej.ops.ComputerOp;
-import net.imagej.ops.Ops;
-import net.imglib2.type.numeric.RealType;
-import net.imglib2.type.numeric.real.DoubleType;
 
 /**
  * Fills an output Dataset by taking the square root of the data values of an
@@ -54,18 +53,13 @@ import net.imglib2.type.numeric.real.DoubleType;
 		mnemonic = 'm'), @Menu(label = "Square Root...", weight = 16) },
 	headless = true, attrs = { @Attr(name = "no-legacy") })
 public class SquareRootDataValues<T extends RealType<T>> extends
-	MathCommand<T, DoubleType>
+	MathCommand<T>
 {
 	// -- public interface --
 
-	public SquareRootDataValues() {
-		super(new DoubleType());
-	}
-
 	@Override
-	public ComputerOp<DoubleType, DoubleType> getOperation() {
-		return opService.computer(Ops.Math.Sqrt.class, DoubleType.class,
-			DoubleType.class);
+	public ComputerOp<T, T> getOperation() {
+		return opService.computer(Ops.Math.Sqrt.class, type, type);
 	}
 
 }

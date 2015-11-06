@@ -70,12 +70,10 @@ import org.scijava.widget.Button;
  * 
  * @author Barry DeZonia
  */
-@Plugin(type = Command.class, menu = {
-	@Menu(label = MenuConstants.PROCESS_LABEL,
-		weight = MenuConstants.PROCESS_WEIGHT,
-		mnemonic = MenuConstants.PROCESS_MNEMONIC),
-	@Menu(label = "Math", mnemonic = 'm'),
-	@Menu(label = "Equation...", weight = 20) },
+@Plugin(type = Command.class, menu = { @Menu(
+	label = MenuConstants.PROCESS_LABEL, weight = MenuConstants.PROCESS_WEIGHT,
+	mnemonic = MenuConstants.PROCESS_MNEMONIC), @Menu(label = "Math",
+		mnemonic = 'm'), @Menu(label = "Equation...", weight = 20) },
 	headless = true, attrs = { @Attr(name = "no-legacy") })
 public class EquationDataValues<T extends RealType<T>> extends ContextCommand {
 
@@ -83,22 +81,22 @@ public class EquationDataValues<T extends RealType<T>> extends ContextCommand {
 
 	@Parameter
 	private OverlayService overlayService;
-	
+
 	@Parameter
 	private ImageDisplayService imgDispService;
-	
+
 	@Parameter
 	private PlatformService platformService;
-	
+
 	@Parameter(type = ItemIO.BOTH)
 	private ImageDisplay display;
 
 	@Parameter(visibility = ItemVisibility.MESSAGE)
-	private final String examples = "<html><b>Format examples:</b>" + "<ul>"
-		+ "<li>img + 40</li>" + "<li>[x,y], x^2 + y^2</li>"
-		+ "<li>[u1,v1,w1] , -2.003*u1 + 8.41*w1 + E + PI</li>"
-		+ "<li>[x,y,c,z,t], cos(t*PI/7) + sin(z*PI/12)</li>" + "</ul>";
-	
+	private final String examples = "<html><b>Format examples:</b>" + "<ul>" +
+		"<li>img + 40</li>" + "<li>[x,y], x^2 + y^2</li>" +
+		"<li>[u1,v1,w1] , -2.003*u1 + 8.41*w1 + E + PI</li>" +
+		"<li>[x,y,c,z,t], cos(t*PI/7) + sin(z*PI/12)</li>" + "</ul>";
+
 	@Parameter(label = "Apply to all planes")
 	private boolean allPlanes;
 
@@ -106,12 +104,12 @@ public class EquationDataValues<T extends RealType<T>> extends ContextCommand {
 	private String equationString;
 
 	@Parameter(label = "Help",
-			description="View a web page detailing the equation language",
-			callback="openWebPage", persist = false)
+		description = "View a web page detailing the equation language",
+		callback = "openWebPage", persist = false)
 	private Button openWebPage;
-	
+
 	// -- instance variables that are not Parameters --
-	
+
 	private Dataset dataset;
 	private long[] origin;
 	private long[] span;
@@ -127,19 +125,18 @@ public class EquationDataValues<T extends RealType<T>> extends ContextCommand {
 			return;
 		}
 		RealEquationFunctionParser parser = new RealEquationFunctionParser();
-		Tuple2<Function<long[],DoubleType>, String> result =
-				parser.parse(equationString, dataset.getImgPlus());
+		Tuple2<Function<long[], DoubleType>, String> result = parser.parse(
+			equationString, dataset.getImgPlus());
 		if (result.get2() != null) {
-			cancel("Equation parsing error: "+result.get2());
+			cancel("Equation parsing error: " + result.get2());
 			return;
 		}
 		InputIteratorFactory<long[]> factory = new PointInputIteratorFactory();
-		Function<long[],DoubleType> function = result.get1();
+		Function<long[], DoubleType> function = result.get1();
 		@SuppressWarnings("unchecked")
-		ImageAssignment<T,DoubleType,long[]> assigner =
-				new ImageAssignment<T, DoubleType, long[]>(
-						(Img<T>)dataset.getImgPlus(), origin, span,
-						function, condition, factory);
+		ImageAssignment<T, DoubleType, long[]> assigner =
+			new ImageAssignment<T, DoubleType, long[]>((Img<T>) dataset.getImgPlus(),
+				origin, span, function, condition, factory);
 		assigner.assign();
 		dataset.update();
 	}
@@ -155,34 +152,33 @@ public class EquationDataValues<T extends RealType<T>> extends ContextCommand {
 	public boolean isAllPlanes() {
 		return allPlanes;
 	}
-	
+
 	public void setAllPlanes(boolean value) {
 		this.allPlanes = value;
 	}
-	
+
 	public String getEquation() {
 		return equationString;
 	}
-	
+
 	public void setEquation(String equationString) {
 		this.equationString = equationString;
 	}
-	
+
 	// -- private helpers --
 
 	private String setRegion(final ImageDisplay disp, boolean allPlanes) {
 		dataset = imgDispService.getActiveDataset(disp);
 		final Overlay overlay = overlayService.getActiveOverlay(disp);
 		final DatasetView view = imgDispService.getActiveDatasetView(disp);
-		
+
 		// check dimensions of Dataset
 		final int xIndex = dataset.dimensionIndex(Axes.X);
 		final int yIndex = dataset.dimensionIndex(Axes.Y);
-		if ((xIndex < 0) || (yIndex < 0))
-			return "display does not have XY planes";
-		
+		if ((xIndex < 0) || (yIndex < 0)) return "display does not have XY planes";
+
 		// calc XY outline boundary
-		final long x,y,w,h;
+		final long x, y, w, h;
 		if (overlay == null) {
 			x = 0;
 			y = 0;
@@ -190,8 +186,8 @@ public class EquationDataValues<T extends RealType<T>> extends ContextCommand {
 			h = dataset.dimension(yIndex);
 		}
 		else {
-			x = (long)overlay.realMin(0);
-			y = (long)overlay.realMin(1);
+			x = (long) overlay.realMin(0);
+			y = (long) overlay.realMin(1);
 			w = Math.round(overlay.realMax(0) - x);
 			h = Math.round(overlay.realMax(1) - y);
 		}
@@ -219,21 +215,22 @@ public class EquationDataValues<T extends RealType<T>> extends ContextCommand {
 				span[i] = 1;
 			}
 		}
-		
+
 		condition = null;
-		if (overlay != null)
-			condition = new UVInsideRoiCondition(overlay.getRegionOfInterest());
-		
+		if (overlay != null) condition = new UVInsideRoiCondition(overlay
+			.getRegionOfInterest());
+
 		return null;
 	}
-	
+
 	protected void openWebPage() {
 		try {
 			String urlString =
-					"http://wiki.imagej.net/ImageJ2/Documentation/Process/Math/Equation";
+				"http://wiki.imagej.net/ImageJ2/Documentation/Process/Math/Equation";
 			URL url = new URL(urlString);
 			platformService.open(url);
-		} catch (Exception e) {
+		}
+		catch (Exception e) {
 			// do nothing
 		}
 	}
