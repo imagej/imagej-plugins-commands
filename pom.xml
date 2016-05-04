@@ -53,6 +53,10 @@
 			<groupId>net.imagej</groupId>
 			<artifactId>imagej-deprecated</artifactId>
 		</dependency>
+		<dependency>
+			<groupId>net.imagej</groupId>
+			<artifactId>imagej-ops</artifactId>
+		</dependency>
 
 		<!-- ImgLib2 dependencies -->
 		<dependency>
