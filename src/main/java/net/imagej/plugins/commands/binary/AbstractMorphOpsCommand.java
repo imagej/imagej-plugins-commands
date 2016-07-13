@@ -32,7 +32,10 @@
 package net.imagej.plugins.commands.binary;
 
 import net.imagej.Dataset;
+import net.imglib2.RandomAccessibleInterval;
 import net.imglib2.ops.types.ConnectedType;
+import net.imglib2.outofbounds.OutOfBoundsConstantValueFactory;
+import net.imglib2.outofbounds.OutOfBoundsFactory;
 import net.imglib2.type.logic.BitType;
 import net.imglib2.type.numeric.RealType;
 
@@ -60,6 +63,12 @@ public abstract class AbstractMorphOpsCommand extends ContextCommand {
 	@Parameter(label = "Neighbors", choices = { FOUR, EIGHT })
 	private String neighbors = FOUR;
 
+        /**
+         * @OutOfBoundsFactory that return False as value for all the pixel that are
+         * out of the image space.
+         */
+        protected static OutOfBoundsFactory< BitType, RandomAccessibleInterval< BitType > > defaultFactory = new OutOfBoundsConstantValueFactory<BitType, RandomAccessibleInterval<BitType>>(new BitType(false));
+        
 	// -- abstract methods --
 
 	abstract protected void updateDataset(Dataset ds);
