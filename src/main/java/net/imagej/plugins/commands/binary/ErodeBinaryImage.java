@@ -32,8 +32,10 @@
 package net.imagej.plugins.commands.binary;
 
 import net.imagej.Dataset;
+import net.imglib2.RandomAccessibleInterval;
 import net.imglib2.img.Img;
 import net.imglib2.ops.operation.randomaccessibleinterval.unary.morph.Erode;
+import net.imglib2.outofbounds.OutOfBoundsBorderFactory;
 import net.imglib2.type.logic.BitType;
 
 import org.scijava.command.Command;
@@ -58,7 +60,7 @@ public class ErodeBinaryImage extends AbstractMorphOpsCommand {
 
 	@Override
 	protected void updateDataset(Dataset ds) {
-		Erode op = new Erode(getConnectedType(), null, 1);
+		Erode op = new Erode(getConnectedType(),defaultFactory, 1);
 		Dataset copy = ds.duplicate();
 		Img<BitType> copyData = (Img<BitType>) copy.getImgPlus();
 		Img<BitType> resultData = (Img<BitType>) ds.getImgPlus();

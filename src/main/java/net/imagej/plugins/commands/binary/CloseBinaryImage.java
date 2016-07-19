@@ -59,8 +59,8 @@ public class CloseBinaryImage extends AbstractMorphOpsCommand {
 
 	@Override
 	protected void updateDataset(Dataset ds) {
-		Erode opErode = new Erode(getConnectedType(), null, 1);
-		Dilate opDilate = new Dilate(getConnectedType(), null, 1);
+		Erode opErode = new Erode(getConnectedType(), defaultFactory, 1);
+		Dilate opDilate = new Dilate(getConnectedType(), defaultFactory, 1);
 		Dataset copy = ds.duplicateBlank();
 		Img<BitType> copyData = (Img<BitType>) copy.getImgPlus();
 		Img<BitType> origData = (Img<BitType>) ds.getImgPlus();

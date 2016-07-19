@@ -32,8 +32,11 @@
 package net.imagej.plugins.commands.binary;
 
 import net.imagej.Dataset;
+import net.imglib2.RandomAccessibleInterval;
 import net.imglib2.img.Img;
 import net.imglib2.ops.operation.randomaccessibleinterval.unary.morph.Dilate;
+import net.imglib2.ops.types.ConnectedType;
+import net.imglib2.outofbounds.OutOfBoundsConstantValueFactory;
 import net.imglib2.type.logic.BitType;
 
 import org.scijava.command.Command;
@@ -58,7 +61,7 @@ public class DilateBinaryImage extends AbstractMorphOpsCommand {
 
 	@Override
 	protected void updateDataset(Dataset ds) {
-		Dilate op = new Dilate(getConnectedType(), null, 1);
+		Dilate op = new Dilate(getConnectedType(),defaultFactory, 1);
 		Dataset copy = ds.duplicate();
 		Img<BitType> copyData = (Img<BitType>) copy.getImgPlus();
 		Img<BitType> resultData = (Img<BitType>) ds.getImgPlus();
