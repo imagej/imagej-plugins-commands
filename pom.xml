@@ -62,6 +62,10 @@
 			<properties><id>afraser</id></properties>
 		</contributor>
 		<contributor>
+			<name>Cyril Mongis</name>
+			<properties><id>cmongis</id></properties>
+		</contributor>
+		<contributor>
 			<name>Wayne Rasband</name>
 			<url>http://imagej.net/Wayne_Rasband</url>
 			<properties><id>rasband</id></properties>
