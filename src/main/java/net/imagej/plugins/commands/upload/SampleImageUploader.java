@@ -61,7 +61,7 @@ import org.scijava.ui.UIService;
  * 
  * @author Johannes Schindelin
  */
-@Plugin(type = Command.class, menuPath = "Help>Upload Sample Image")
+@Plugin(type = Command.class, menuPath = "Help>Upload Sample Image...")
 public class SampleImageUploader implements Command {
 
 	@Parameter
