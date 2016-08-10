@@ -10,7 +10,7 @@
 	</parent>
 
 	<artifactId>imagej-plugins-commands</artifactId>
-	<version>0.7.0-SNAPSHOT</version>
+	<version>0.7.0</version>
 
 	<name>ImageJ Plugins: Commands</name>
 	<description>Core commands for ImageJ.</description>
@@ -75,7 +75,7 @@
 	<scm>
 		<connection>scm:git:git://github.com/imagej/imagej-plugins-commands</connection>
 		<developerConnection>scm:git:git@github.com:imagej/imagej-plugins-commands</developerConnection>
-		<tag>HEAD</tag>
+		<tag>imagej-plugins-commands-0.7.0</tag>
 		<url>https://github.com/imagej/imagej-plugins-commands</url>
 	</scm>
 	<issueManagement>
