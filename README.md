@@ -1,4 +1,4 @@
-[![](http://jenkins.imagej.net/job/ImageJ-plugins-commands/lastBuild/badge/icon)](http://jenkins.imagej.net/job/ImageJ-plugins-commands/)
+[![](https://travis-ci.org/imagej/imagej-plugins-commands.svg?branch=master)](https://travis-ci.org/imagej/imagej-plugins-commands)
 
 ImageJ Plugins: Commands
 ------------------------
