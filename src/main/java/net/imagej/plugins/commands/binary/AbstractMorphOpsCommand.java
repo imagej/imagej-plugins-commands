@@ -63,12 +63,12 @@ public abstract class AbstractMorphOpsCommand extends ContextCommand {
 	@Parameter(label = "Neighbors", choices = { FOUR, EIGHT })
 	private String neighbors = FOUR;
 
-        /**
-         * @OutOfBoundsFactory that return False as value for all the pixel that are
-         * out of the image space.
-         */
-        protected static OutOfBoundsFactory< BitType, RandomAccessibleInterval< BitType > > defaultFactory = new OutOfBoundsConstantValueFactory<BitType, RandomAccessibleInterval<BitType>>(new BitType(false));
-        
+	/**
+	 * {@link OutOfBoundsFactory} that return False as value for all the pixel
+	 * that are out of the image space.
+	 */
+	protected static OutOfBoundsFactory< BitType, RandomAccessibleInterval< BitType > > defaultFactory = new OutOfBoundsConstantValueFactory<BitType, RandomAccessibleInterval<BitType>>(new BitType(false));
+
 	// -- abstract methods --
 
 	abstract protected void updateDataset(Dataset ds);

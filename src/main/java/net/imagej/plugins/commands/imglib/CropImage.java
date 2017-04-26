@@ -63,7 +63,7 @@ import org.scijava.util.RealRect;
 //TODO - add correct weight to @Plugin annotation.
 
 /**
- * Replaces the pixels of an input Dataset by cropping in X & Y using its
+ * Replaces the pixels of an input Dataset by cropping in X + Y using its
  * currently selected region. Works on images of any dimensionality.
  * 
  * @author Barry DeZonia

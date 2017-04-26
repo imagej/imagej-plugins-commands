@@ -32,7 +32,7 @@
 package net.imagej.plugins.commands.imglib;
 
 /**
- * TODO - This interface was created from ImgLib's Algorithm & OutputAlgorithm.
+ * TODO - This interface was created from ImgLib's Algorithm + OutputAlgorithm.
  * We plan to use those later when ImgLib algorithms ported to ImgLib2.
  * 
  * @author Barry DeZonia

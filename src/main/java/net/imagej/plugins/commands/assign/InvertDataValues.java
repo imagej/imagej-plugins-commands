@@ -57,7 +57,7 @@ import org.scijava.plugin.Plugin;
  * Fills an output Dataset by applying an inversion to an input Dataset's data
  * values. The inversion is relative to the minimum and maximum data values
  * present in the input Dataset. However when legacy compatibility mode is
- * enabled an unsigned 8-bit dataset is inverted relative to 0 & 255.
+ * enabled an unsigned 8-bit dataset is inverted relative to 0 and 255.
  * 
  * @author Barry DeZonia
  */

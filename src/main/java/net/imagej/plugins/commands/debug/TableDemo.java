@@ -45,7 +45,7 @@ import org.scijava.plugin.Plugin;
 import org.scijava.util.MersenneTwisterFast;
 
 /**
- * A demonstration of the {@link imagej.data.table} package.
+ * A demonstration of the {@link net.imagej.table} package.
  * 
  * @author Curtis Rueden
  */
