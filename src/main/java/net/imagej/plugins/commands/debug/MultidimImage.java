@@ -31,8 +31,6 @@
 
 package net.imagej.plugins.commands.debug;
 
-import io.scif.img.axes.SCIFIOAxes;
-
 import java.util.Arrays;
 import java.util.List;
 
@@ -74,7 +72,7 @@ public class MultidimImage implements Command {
 		final long[] dims = new long[] { 90, 35, 4, 5, 6, 7 };
 		final String name = "Multidimensional Example";
 		final AxisType[] axes =
-			new AxisType[] { Axes.X, Axes.Y, Axes.CHANNEL, SCIFIOAxes.FREQUENCY,
+			new AxisType[] { Axes.X, Axes.Y, Axes.CHANNEL, Axes.get("frequency"),
 				Axes.Z, Axes.TIME };
 		final int bitsPerPixel = 8;
 		final boolean signed = false;

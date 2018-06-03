@@ -5,13 +5,13 @@
 	<parent>
 		<groupId>org.scijava</groupId>
 		<artifactId>pom-scijava</artifactId>
-		<version>17.1.1</version>
+		<version>22.2.0</version>
 		<relativePath />
 	</parent>
 
 	<groupId>net.imagej</groupId>
 	<artifactId>imagej-plugins-commands</artifactId>
-	<version>0.7.2-SNAPSHOT</version>
+	<version>0.8.0-SNAPSHOT</version>
 
 	<name>ImageJ Plugins: Commands</name>
 	<description>Core commands for ImageJ.</description>
@@ -127,12 +127,6 @@ Institute of Molecular Cell Biology and Genetics.</license.copyrightOwners>
 	</repositories>
 
 	<dependencies>
-		<!-- SCIFIO dependencies -->
-		<dependency>
-			<groupId>io.scif</groupId>
-			<artifactId>scifio</artifactId>
-		</dependency>
-
 		<!-- ImageJ dependencies -->
 		<dependency>
 			<groupId>net.imagej</groupId>
