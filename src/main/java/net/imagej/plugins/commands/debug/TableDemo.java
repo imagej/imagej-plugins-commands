@@ -31,9 +31,7 @@
 
 package net.imagej.plugins.commands.debug;
 
-import net.imagej.table.DefaultGenericTable;
 import net.imagej.table.DefaultResultsTable;
-import net.imagej.table.GenericTable;
 import net.imagej.table.ResultsTable;
 
 import org.scijava.ItemIO;
@@ -42,10 +40,13 @@ import org.scijava.command.Command;
 import org.scijava.plugin.Attr;
 import org.scijava.plugin.Parameter;
 import org.scijava.plugin.Plugin;
+import org.scijava.table.DefaultGenericTable;
+import org.scijava.table.GenericTable;
 import org.scijava.util.MersenneTwisterFast;
 
 /**
- * A demonstration of the {@link net.imagej.table} package.
+ * A demonstration of the {@link org.scijava.table} and
+ * {@link net.imagej.table} packages.
  * 
  * @author Curtis Rueden
  */

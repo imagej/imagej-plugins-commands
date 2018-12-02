@@ -5,7 +5,7 @@
 	<parent>
 		<groupId>org.scijava</groupId>
 		<artifactId>pom-scijava</artifactId>
-		<version>22.2.0</version>
+		<version>23.2.0</version>
 		<relativePath />
 	</parent>
 
@@ -151,6 +151,10 @@ Institute of Molecular Cell Biology and Genetics.</license.copyrightOwners>
 		<dependency>
 			<groupId>org.scijava</groupId>
 			<artifactId>scijava-common</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.scijava</groupId>
+			<artifactId>scijava-table</artifactId>
 		</dependency>
 
 		<!-- Third-party dependencies -->

@@ -33,9 +33,6 @@ package net.imagej.plugins.commands.app;
 
 import java.util.List;
 
-import net.imagej.table.DefaultGenericTable;
-import net.imagej.table.GenericTable;
-
 import org.scijava.ItemIO;
 import org.scijava.MenuEntry;
 import org.scijava.MenuPath;
@@ -49,6 +46,8 @@ import org.scijava.plugin.Attr;
 import org.scijava.plugin.Menu;
 import org.scijava.plugin.Parameter;
 import org.scijava.plugin.Plugin;
+import org.scijava.table.DefaultGenericTable;
+import org.scijava.table.GenericTable;
 
 /**
  * Lists ImageJ commands with keyboard shortcuts in a table.
