@@ -57,7 +57,7 @@ import org.scijava.plugin.Plugin;
 
 //TODO - add correct weight to @Plugin annotation.
 
-// TODO - blacklist the StackReverser plugin. It is broken for our CellImgs.
+// TODO - blocklist the StackReverser plugin. It is broken for our CellImgs.
 // The plugin is referenced twice as Image Transform Flip Z and Image Stacks
 // Tools Reverse.
 
