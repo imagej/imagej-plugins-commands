@@ -1,4 +1,4 @@
-[![](https://travis-ci.org/imagej/imagej-plugins-commands.svg?branch=master)](https://travis-ci.org/imagej/imagej-plugins-commands)
+[![](https://github.com/imagej/imagej-plugins-commands/actions/workflows/build-main.yml/badge.svg)](https://github.com/imagej/imagej-plugins-commands/actions/workflows/build-main.yml)
 
 ImageJ Plugins: Commands
 ------------------------
