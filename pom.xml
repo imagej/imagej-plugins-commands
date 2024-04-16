@@ -32,7 +32,7 @@
 		<developer>
 			<id>ctrueden</id>
 			<name>Curtis Rueden</name>
-			<url>https://imagej.net/User:Rueden</url>
+			<url>https://imagej.net/people/ctrueden</url>
 			<roles>
 				<role>founder</role>
 				<role>lead</role>
@@ -47,27 +47,27 @@
 	<contributors>
 		<contributor>
 			<name>Mark Hiner</name>
-			<url>https://imagej.net/User:Hinerm</url>
+			<url>https://imagej.net/people/hinerm</url>
 			<properties><id>hinerm</id></properties>
 		</contributor>
 		<contributor>
 			<name>Johannes Schindelin</name>
-			<url>https://imagej.net/User:Schindelin</url>
+			<url>https://imagej.net/people/dscho</url>
 			<properties><id>dscho</id></properties>
 		</contributor>
 		<contributor>
 			<name>Barry DeZonia</name>
-			<url>https://imagej.net/User:Bdezonia</url>
+			<url>https://imagej.net/people/bdezonia</url>
 			<properties><id>bdezonia</id></properties>
 		</contributor>
 		<contributor>
 			<name>Lee Kamentsky</name>
-			<url>https://imagej.net/User:Leek</url>
+			<url>https://imagej.net/people/LeeKamentsky</url>
 			<properties><id>LeeKamentsky</id></properties>
 		</contributor>
 		<contributor>
 			<name>Grant Harris</name>
-			<url>https://imagej.net/User:Harris</url>
+			<url>https://imagej.net/people/tnargsirrah</url>
 			<properties><id>tnargsirrah</id></properties>
 		</contributor>
 		<contributor>
@@ -80,7 +80,7 @@
 		</contributor>
 		<contributor>
 			<name>Wayne Rasband</name>
-			<url>https://imagej.net/Wayne_Rasband</url>
+			<url>https://imagej.net/people/rasband</url>
 			<properties><id>rasband</id></properties>
 		</contributor>
 	</contributors>
