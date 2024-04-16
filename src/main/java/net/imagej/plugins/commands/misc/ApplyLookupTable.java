@@ -64,8 +64,9 @@ import org.scijava.plugin.Plugin;
  * entries are constructed using their URLs with instances of this class.
  * 
  * @author Barry DeZonia
+ * @deprecated Use {@link net.imagej.lut.ApplyLookupTable} instead.
  */
-@Plugin(type = Command.class, attrs = { @Attr(name = "no-legacy") })
+@Deprecated
 public class ApplyLookupTable implements Command {
 
 	// -- Parameters --
