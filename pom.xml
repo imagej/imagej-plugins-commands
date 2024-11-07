@@ -5,7 +5,7 @@
 	<parent>
 		<groupId>org.scijava</groupId>
 		<artifactId>pom-scijava</artifactId>
-		<version>37.0.0</version>
+		<version>39.0.0</version>
 		<relativePath />
 	</parent>
 
@@ -118,7 +118,8 @@ Institute of Molecular Cell Biology and Genetics.</license.copyrightOwners>
 		<!-- NB: Deploy releases to the SciJava Maven repository. -->
 		<releaseProfiles>sign,deploy-to-scijava</releaseProfiles>
 
-		<imagej-common.version>2.1.0</imagej-common.version>
+		<object-inspector.version>0.1</object-inspector.version>
+		<base64.version>2.3.8</base64.version>
 	</properties>
 
 	<repositories>
@@ -163,12 +164,12 @@ Institute of Molecular Cell Biology and Genetics.</license.copyrightOwners>
 		<dependency>
 			<groupId>com.github.sbridges.object-inspector</groupId>
 			<artifactId>object-inspector</artifactId>
-			<version>0.1</version>
+			<version>${object-inspector.version}</version>
 		</dependency>
 		<dependency>
 			<groupId>net.iharder</groupId>
 			<artifactId>base64</artifactId>
-			<version>2.3.8</version>
+			<version>${base64.version}</version>
 		</dependency>
 	</dependencies>
 </project>
